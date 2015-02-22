@@ -49,4 +49,4 @@ $(BUILDDIR)/%.o: $(SRC)/%.cpp pre-build
 
 clean:
 	rm -f -R $(BUILDDIR)
-	rm -f *.o *.stdout *.txt
+	rm -f *.o $(BINDIR)/*.stdout

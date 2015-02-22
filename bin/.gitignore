@@ -1,0 +1,10 @@
+# Ignore executables
+mpi
+openmp
+pthreads
+serial
+autograder
+
+# Ignore output from jobs
+mpi.txt
+*.stdout

@@ -1,6 +1,5 @@
-# Ignore output directories
+# Ignore build directories
 build/
-bin/
 
 # Compiled Object files
 *.slo
