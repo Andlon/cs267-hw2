@@ -23,6 +23,10 @@ TARGETS = $(SERIAL_TARGET) $(PTHREADS_TARGET) $(OPENMP_TARGET) $(MPI_TARGET) $(A
 
 all:	$(TARGETS)
 
+pre-build:
+	mkdir -p build
+	mkdir -p bin
+
 $(SERIAL_TARGET): $(BUILDDIR)/serial.o $(BUILDDIR)/common.o
 	$(CC) -o $@ $(LIBS) $(BUILDDIR)/serial.o $(BUILDDIR)/common.o
 
@@ -39,8 +43,10 @@ $(MPI_TARGET): $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o
 	$(MPCC) -o $@ $(LIBS) $(MPILIBS) $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o
 
 # Build all object files (note: here we assume we want to use the same compiler flags for all objects)
-$(BUILDDIR)/%.o: $(SRC)/%.cpp
-	$(CC) -c $(CFLAGS) $^
+# We add pre-build as a dependency and filter it out when building as to make sure necessary directories exist
+$(BUILDDIR)/%.o: $(SRC)/%.cpp pre-build
+	$(CC) -c $(CFLAGS) $(filter-out pre-build,$?) -o $@
 
 clean:
-	rm -f *.o $(TARGETS) *.stdout *.txt
+	rm -f -R $(BUILDDIR)
+	rm -f *.o *.stdout *.txt
