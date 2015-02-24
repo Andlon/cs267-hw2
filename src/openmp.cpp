@@ -43,7 +43,7 @@ int main( int argc, char **argv )
     #pragma omp parallel private(dmin) 
     {
     numthreads = omp_get_num_threads();
-    for( int step = 0; step < 1000; step++ )
+    for( int step = 0; step < NSTEPS; step++ )
     {
         navg = 0;
         davg = 0.0;

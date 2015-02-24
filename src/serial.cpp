@@ -4,6 +4,7 @@
 #include <math.h>
 #include "common.h"
 
+
 //
 //  benchmarking program
 //
@@ -34,32 +35,44 @@ int main( int argc, char **argv )
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
     set_size( n );
     init_particles( n, particles );
+
+    bin_t *bins;
+    int n_bins = init_bins(bins);
     
     //
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-	
+    
     for( int step = 0; step < NSTEPS; step++ )
     {
-	navg = 0;
+        navg = 0;
         davg = 0.0;
-	dmin = 1.0;
+        dmin = 1.0;
+
+        //  assign particles to bins
+        bin_particles(bins, particles, n);
+        
         //
-        //  compute forces
+        //  compute forces in bin
         //
+        for (int i = 0; i < n_bins; i++) {
+          apply_force_bin (bins, i, &dmin,&davg,&navg);
+        }
+/*
+        //  compute forces between bins
         for( int i = 0; i < n; i++ )
         {
             particles[i].ax = particles[i].ay = 0;
             for (int j = 0; j < n; j++ )
-				apply_force( particles[i], particles[j],&dmin,&davg,&navg);
+                apply_force( particles[i], particles[j],&dmin,&davg,&navg);
         }
- 
+*/
         //
         //  move particles
         //
         for( int i = 0; i < n; i++ ) 
-            move( particles[i] );		
+            move( particles[i] );        
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
@@ -71,7 +84,7 @@ int main( int argc, char **argv )
             nabsavg++;
           }
           if (dmin < absmin) absmin = dmin;
-		
+        
           //
           //  save if necessary
           //
@@ -108,6 +121,7 @@ int main( int argc, char **argv )
     //
     // Clearing space
     //
+    clear_bins(bins);
     if( fsum )
         fclose( fsum );    
     free( particles );
