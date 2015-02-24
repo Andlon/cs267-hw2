@@ -57,7 +57,7 @@ int main( int argc, char **argv )
         //  compute forces in bin
         //
         for (int i = 0; i < n_bins; i++) {
-          apply_force_bin (bins, i, &dmin,&davg,&navg);
+          apply_force_bin (bins, i, &dmin,davg,navg);
         }
 /*
         //  compute forces between bins
@@ -65,7 +65,7 @@ int main( int argc, char **argv )
         {
             particles[i].ax = particles[i].ay = 0;
             for (int j = 0; j < n; j++ )
-                apply_force( particles[i], particles[j],&dmin,&davg,&navg);
+                apply_force( particles[i], particles[j],&dmin,davg,navg);
         }
 */
         //

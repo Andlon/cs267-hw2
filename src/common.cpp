@@ -121,7 +121,7 @@ void bin_particles( bin_t *bins, particle_t *particles, int n) {
 //
 //  interact two particles
 //
-void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, double *davg, int *navg)
+void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, double &davg, int &navg)
 {
 
     double dx = neighbor.x - particle.x;
@@ -133,8 +133,8 @@ void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, dou
     {
        if (r2/(cutoff*cutoff) < *dmin * (*dmin))
           *dmin = sqrt(r2)/cutoff;
-       (*davg) += sqrt(r2)/cutoff;
-       (*navg) ++;
+       davg += sqrt(r2)/cutoff;
+       navg ++;
     }
         
     r2 = fmax( r2, min_r*min_r );
@@ -148,7 +148,7 @@ void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, dou
     particle.ay += coef * dy;
 }
 
-void apply_force_bin( bin_t *bins, int bin_id, double *dmin, double *davg, int *navg) {
+void apply_force_bin( bin_t *bins, int bin_id, double *dmin, double &davg, int &navg) {
   if (bins[bin_id].num_particles() == 0) // nothing to apply
     return;
 

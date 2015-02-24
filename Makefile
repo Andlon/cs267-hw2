@@ -45,7 +45,7 @@ $(MPI_TARGET): $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o
 # Build all object files (note: here we assume we want to use the same compiler flags for all objects)
 # We add pre-build as a dependency and filter it out when building as to make sure necessary directories exist
 $(BUILDDIR)/%.o: $(SRC)/%.cpp pre-build
-	$(CC) -c $(CFLAGS) $(filter-out pre-build,$?) -o $@
+	$(CC) -c $(CFLAGS) $(OPENMP) $(filter-out pre-build,$?) -o $@
 
 clean:
 	rm -f -R $(BUILDDIR)

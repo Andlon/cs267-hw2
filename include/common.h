@@ -57,8 +57,8 @@ void init_particles( int n, particle_t *p );
 int init_bins (bin_t*& bins);
 void clear_bins(bin_t*& bins);
 void bin_particles( bin_t *bins, particle_t *particles, int n);
-void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, double *davg, int *navg);
-void apply_force_bin( bin_t *bins, int bin_id, double *dmin, double *davg, int *navg);
+void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, double &davg, int &navg);
+void apply_force_bin( bin_t *bins, int bin_id, double *dmin, double &davg, int &navg);
 void move( particle_t &p );
 
 

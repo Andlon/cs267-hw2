@@ -48,7 +48,7 @@ void *thread_routine( void *pthread_id )
         {
             particles[i].ax = particles[i].ay = 0;
             for (int j = 0; j < n; j++ )
-                apply_force( particles[i], particles[j], &dmin, &davg, &navg );
+                apply_force( particles[i], particles[j], &dmin, davg, navg );
         }
         
         pthread_barrier_wait( &barrier );
