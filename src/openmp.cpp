@@ -41,26 +41,44 @@ int main( int argc, char **argv )
 
   bin_t *bins;
   int n_bins = init_bins(bins);
+  int n_bins_per_side = sqrt(n_bins);
 
   //
   //  simulate a number of time steps
   //
   double simulation_time = read_timer( );
 
-  #pragma omp parallel private(dmin) 
-  {
-    numthreads = omp_get_num_threads();
 
-    for( int step = 0; step < NSTEPS; step++ )
+  for( int step = 0; step < NSTEPS; step++ )
+  {
+    navg = 0;
+    davg = 0.0;
+
+    #pragma omp parallel private(dmin)
     {
-      navg = 0;
-      davg = 0.0;
       dmin = 1.0;
+      numthreads = omp_get_num_threads();
 
       //  assign particles to bins
+/*      #pragma omp for
+      for (int i = 0; i < n_bins_per_side; i++) {
+        for (int j = 0; j < n_bins_per_side; j++) {
+          bins[i*n_bins_per_side+j].clear();
+        }
+      }
+
+      #pragma omp for 
+      for (int i = 0; i < n; i++) {
+        int bin_x_id = floor(particles[i].x / bin_size);
+        int bin_y_id = floor(particles[i].y / bin_size);
+        int bin_id = bin_x_id * n_bins_per_side + bin_y_id;
+        #pragma omp critical
+        bins[bin_id].add_particle(particles+i);
+      }
+*/
       #pragma omp single
       bin_particles(bins, particles, n);
-
+ 
       //
       //  compute all forces
       //
@@ -76,16 +94,6 @@ int main( int argc, char **argv )
         }
       }
 
-
-//      #pragma omp for reduction (+:navg) reduction(+:davg)
-//      for( int i = 0; i < n; i++ )
-//      {
-//        particles[i].ax = particles[i].ay = 0;
-//        for (int j = 0; j < n; j++ )
-//            apply_force( particles[i], particles[j],&dmin,davg,navg);
-//      }
-      
-      
       //
       //  move particles
       //
@@ -115,7 +123,8 @@ int main( int argc, char **argv )
           save( fsave, n, particles );
       }
     }
-  } 
+  }
+
   simulation_time = read_timer( ) - simulation_time;
 
   printf( "n = %d,threads = %d, simulation time = %g seconds", n,numthreads, simulation_time);
