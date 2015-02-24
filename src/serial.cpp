@@ -56,9 +56,16 @@ int main( int argc, char **argv )
         //
         //  compute forces in bin
         //
-        for (int i = 0; i < n_bins; i++) {
-          apply_force_bin (bins, i, &dmin,davg,navg);
+        if( find_option( argc, argv, "-no" ) == -1 ) {
+          for (int i = 0; i < n_bins; i++) {
+            apply_force_bin (bins, i, &dmin,davg,navg);
+          }
+        } else {
+          for (int i = 0; i < n_bins; i++) {
+            apply_force_bin (bins, i, NULL,davg,navg);
+          }
         }
+
 /*
         //  compute forces between bins
         for( int i = 0; i < n; i++ )

@@ -129,7 +129,7 @@ void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, dou
     double r2 = dx * dx + dy * dy;
     if( r2 > cutoff*cutoff )
         return;
-    if (r2 != 0)
+    if (dmin != NULL && r2 != 0)
     {
        if (r2/(cutoff*cutoff) < *dmin * (*dmin))
           *dmin = sqrt(r2)/cutoff;

@@ -64,10 +64,18 @@ int main( int argc, char **argv )
       //
       //  compute all forces
       //
-      #pragma omp for reduction (+:navg) reduction(+:davg)
-      for (int i = 0; i < n_bins; i++) {
-        apply_force_bin (bins, i, &dmin,davg,navg);
+      if( find_option( argc, argv, "-no" ) == -1 ) {
+        #pragma omp for reduction (+:navg) reduction(+:davg)
+        for (int i = 0; i < n_bins; i++) {
+          apply_force_bin (bins, i, &dmin,davg,navg);
+        }
+      } else {
+        #pragma omp for
+        for (int i = 0; i < n_bins; i++) {
+          apply_force_bin (bins, i, NULL, davg, navg);
+        }
       }
+
 
 //      #pragma omp for reduction (+:navg) reduction(+:davg)
 //      for( int i = 0; i < n; i++ )
