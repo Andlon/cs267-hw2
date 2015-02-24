@@ -42,6 +42,10 @@ int main( int argc, char **argv )
   bin_t *bins;
   int n_bins = init_bins(bins);
   int n_bins_per_side = sqrt(n_bins);
+  omp_lock_t* locks = (omp_lock_t*) malloc(n_bins * sizeof(omp_lock_t) );
+  for (int i = 0; i < n_bins; i++) {
+    omp_init_lock(locks+i);
+  }
 
   //
   //  simulate a number of time steps
@@ -60,7 +64,7 @@ int main( int argc, char **argv )
       numthreads = omp_get_num_threads();
 
       //  assign particles to bins
-/*      #pragma omp for
+      #pragma omp for
       for (int i = 0; i < n_bins_per_side; i++) {
         for (int j = 0; j < n_bins_per_side; j++) {
           bins[i*n_bins_per_side+j].clear();
@@ -72,12 +76,13 @@ int main( int argc, char **argv )
         int bin_x_id = floor(particles[i].x / bin_size);
         int bin_y_id = floor(particles[i].y / bin_size);
         int bin_id = bin_x_id * n_bins_per_side + bin_y_id;
-        #pragma omp critical
+        omp_set_lock(locks+bin_id);
         bins[bin_id].add_particle(particles+i);
+        omp_unset_lock(locks+bin_id);
       }
-*/
-      #pragma omp single
-      bin_particles(bins, particles, n);
+
+//      #pragma omp single
+//      bin_particles(bins, particles, n);
  
       //
       //  compute all forces
