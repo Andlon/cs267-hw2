@@ -53,15 +53,15 @@ int main( int argc, char **argv )
   double simulation_time = read_timer( );
 
 
-  for( int step = 0; step < NSTEPS; step++ )
+  #pragma omp parallel private(dmin)
   {
-    navg = 0;
-    davg = 0.0;
+    numthreads = omp_get_num_threads();
 
-    #pragma omp parallel private(dmin)
+    for( int step = 0; step < NSTEPS; step++ )
     {
+      navg = 0;
+      davg = 0.0;
       dmin = 1.0;
-      numthreads = omp_get_num_threads();
 
       //  assign particles to bins
       #pragma omp for
