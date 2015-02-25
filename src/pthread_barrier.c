@@ -5,8 +5,7 @@
 #include "pthread_barrier.h"
 
 
-int
-pthread_barrier_destroy (pthread_barrier_t* bar)
+int pthread_barrier_destroy (pthread_barrier_t* bar)
 {
   int err, err2;
 
@@ -39,8 +38,7 @@ pthread_barrier_destroy (pthread_barrier_t* bar)
   return err;
 }
 
-int
-pthread_barrier_init (pthread_barrier_t* bar,
+int pthread_barrier_init (pthread_barrier_t* bar,
 		      const pthread_barrierattr_t* attr,
 		      unsigned nthr)
 {
@@ -65,8 +63,7 @@ pthread_barrier_init (pthread_barrier_t* bar,
   return 0;
 }
 
-int
-pthread_barrier_wait (pthread_barrier_t* bar_)
+int pthread_barrier_wait (pthread_barrier_t* bar_)
 {
   volatile pthread_barrier_t* bar = bar_;
   int tmp;
@@ -98,15 +95,13 @@ pthread_barrier_wait (pthread_barrier_t* bar_)
   return err;
 }
 
-int
-pthread_barrierattr_destroy (pthread_barrierattr_t* attr /*NOTUSED*/)
+int pthread_barrierattr_destroy (pthread_barrierattr_t* attr /*NOTUSED*/)
 {
   if (!attr) return EINVAL;
   return 0;
 }
 
-int
-pthread_barrierattr_getpshared (const pthread_barrierattr_t* attr /*NOTUSED*/,
+int pthread_barrierattr_getpshared (const pthread_barrierattr_t* attr /*NOTUSED*/,
 				int* pshared)
 {
   if (!attr) return EINVAL;
@@ -114,15 +109,13 @@ pthread_barrierattr_getpshared (const pthread_barrierattr_t* attr /*NOTUSED*/,
   return 0;
 }
 
-int
-pthread_barrierattr_init (pthread_barrierattr_t* attr)
+int pthread_barrierattr_init (pthread_barrierattr_t* attr)
 {
   if (!attr) return EINVAL;
   return 1;
 }
 
-int
-pthread_barrierattr_setpshared (pthread_barrierattr_t* attr, int pshared)
+int pthread_barrierattr_setpshared (pthread_barrierattr_t* attr, int pshared)
 {
   if (!attr) return EINVAL;
   if (pshared != PTHREAD_PROCESS_PRIVATE)

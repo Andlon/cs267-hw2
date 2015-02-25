@@ -3,6 +3,7 @@
 #include <assert.h>
 #include <math.h>
 #include <pthread.h>
+#include <assert.h>
 #include "common.h"
 
 //
@@ -10,9 +11,12 @@
 //
 int n, n_threads,no_output=0;
 particle_t *particles;
+bin_t *bins;
+int n_bins;
 FILE *fsave,*fsum;
 pthread_barrier_t barrier;
 pthread_mutex_t mutex=PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t *bin_mutex;
 double gabsmin=1.0,gabsavg=0.0;
 
 //
@@ -32,6 +36,11 @@ void *thread_routine( void *pthread_id )
     int particles_per_thread = (n + n_threads - 1) / n_threads;
     int first = min(  thread_id    * particles_per_thread, n );
     int last  = min( (thread_id+1) * particles_per_thread, n );
+
+    int n_bins_per_side = sqrt(n_bins);
+    int bins_per_thread = (n_bins + n_threads - 1) / n_threads;
+    int first_bin = min(  thread_id    * bins_per_thread, n_bins );
+    int last_bin = min( (thread_id+1) * bins_per_thread, n_bins );
     
     //
     //  simulate a number of time steps
@@ -44,12 +53,33 @@ void *thread_routine( void *pthread_id )
         //
         //  compute forces
         //
-        for( int i = first; i < last; i++ )
+        for (int i = first_bin; i < last_bin; i++) {
+          bins[i].clear();
+        }
+
+        pthread_barrier_wait( &barrier );
+        
+        for (int i = first; i < last; i++) {
+          int bin_x_id = floor(particles[i].x / bin_size);
+          int bin_y_id = floor(particles[i].y / bin_size);
+          int bin_id = bin_x_id * n_bins_per_side + bin_y_id;
+          
+          pthread_mutex_lock(&bin_mutex[bin_id]);
+          bins[bin_id].add_particle(&particles[i]);
+          pthread_mutex_unlock(&bin_mutex[bin_id]);
+        }
+        
+        pthread_barrier_wait( &barrier );
+        for (int i = first_bin; i < last_bin; i++) {
+          apply_force_bin (bins, i, &dmin,davg,navg);
+        }
+
+/*      for( int i = first; i < last; i++ )
         {
             particles[i].ax = particles[i].ay = 0;
             for (int j = 0; j < n; j++ )
                 apply_force( particles[i], particles[j], &dmin, davg, navg );
-        }
+        }*/
         
         pthread_barrier_wait( &barrier );
         
@@ -63,7 +93,7 @@ void *thread_routine( void *pthread_id )
             nabsavg++;
           }
           if (dmin < absmin) absmin = dmin;
-	}
+        }
 
         //
         //  move particles
@@ -79,12 +109,12 @@ void *thread_routine( void *pthread_id )
         if (no_output == 0) 
           if( thread_id == 0 && fsave && (step%SAVEFREQ) == 0 )
             save( fsave, n, particles );
-        
+              
     }
      
     if (no_output == 0 )
     {
-      absavg /= nabsavg; 	
+      absavg /= nabsavg;     
       //printf("Thread %d has absmin = %lf and absavg = %lf\n",thread_id,absmin,absavg);
       pthread_mutex_lock(&mutex);
       gabsavg += absavg;
@@ -116,7 +146,7 @@ int main( int argc, char **argv )
     }
     
     n = read_int( argc, argv, "-n", 1000 );
-    n_threads = read_int( argc, argv, "-p", 2 );
+    n_threads = read_int( argc, argv, "-p", 1 );
     char *savename = read_string( argc, argv, "-o", NULL );
     char *sumname = read_string( argc, argv, "-s", NULL );
 
@@ -133,9 +163,15 @@ int main( int argc, char **argv )
     set_size( n );
     init_particles( n, particles );
 
+    n_bins = init_bins(bins);
+
     pthread_attr_t attr;
     P( pthread_attr_init( &attr ) );
     P( pthread_barrier_init( &barrier, NULL, n_threads ) );
+    bin_mutex = (pthread_mutex_t *) malloc( n_bins * sizeof(pthread_mutex_t) );
+    for (int i = 0; i < n_bins; i++) {
+      P( pthread_mutex_init(&bin_mutex[i], NULL) );
+    }
 
     int *thread_ids = (int *) malloc( n_threads * sizeof( int ) );
     for( int i = 0; i < n_threads; i++ ) 
@@ -154,9 +190,10 @@ int main( int argc, char **argv )
     
     for( int i = 1; i < n_threads; i++ ) 
         P( pthread_join( threads[i], NULL ) );
+
     simulation_time = read_timer( ) - simulation_time;
    
-    printf( "n = %d, simulation time = %g seconds", n, simulation_time);
+    printf( "n = %d, n_threads=%d, simulation time = %g seconds", n, n_threads, simulation_time);
 
     if( find_option( argc, argv, "-no" ) == -1 )
     {
@@ -183,8 +220,13 @@ int main( int argc, char **argv )
     //
     //  release resources
     //
+    for (int i = 0; i < n_bins; i++) {
+      P( pthread_mutex_destroy(&bin_mutex[i]) );
+    }
+    free(bin_mutex);
     P( pthread_barrier_destroy( &barrier ) );
     P( pthread_attr_destroy( &attr ) );
+    clear_bins(bins);
     free( thread_ids );
     free( threads );
     free( particles );

@@ -162,6 +162,7 @@ int main( int argc, char **argv )
   if( fsum )
     fclose( fsum );
 
+  clear_bins(bins);
   free( particles );
   if( fsave )
     fclose( fsave );

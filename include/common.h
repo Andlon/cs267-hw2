@@ -39,7 +39,7 @@ typedef struct
 struct bin_t
 {
   std::vector<particle_t*> particles;
-  bin_t() {}
+  bin_t() { particles.resize(100); }
   void add_particle(particle_t* particle) {
     particles.push_back(particle);
   }
