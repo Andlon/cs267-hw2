@@ -1,0 +1,4 @@
+CC = CC
+MPCC = CC
+OPENMP = -mp
+CFLAGS = -O3 -I$(INCLUDEPATH)
