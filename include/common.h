@@ -36,18 +36,20 @@ typedef struct
 } particle_t;
 
 
-struct bin_t
+class bin_t
 {
-  std::vector<particle_t*> particles;
-  bin_t() { particles.resize(100); }
-  void add_particle(particle_t* particle) {
+private:
+  std::vector<particle_t *> particles;
+public:
+  bin_t() { /*particles.resize(100);*/ }
+  void add_particle(particle_t *particle) {
     particles.push_back(particle);
-  }
-  void add_NULL () {
-    particles.push_back(NULL);
   }
   void clear() {
     particles.clear();
+  }
+  particle_t *get_particle(int i) {
+    return particles[i];
   }
   int num_particles() {
     return particles.size();
