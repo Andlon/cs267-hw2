@@ -70,8 +70,15 @@ void *thread_routine( void *pthread_id )
         }
         
         pthread_barrier_wait( &barrier );
-        for (int i = first_bin; i < last_bin; i++) {
-          apply_force_bin (bins, i, &dmin,davg,navg);
+        
+        if( no_output == 0 ) {
+          for (int i = first_bin; i < last_bin; i++) {
+            apply_force_bin (bins, i, &dmin,davg,navg);
+          }
+        } else {
+          for (int i = first_bin; i < last_bin; i++) {
+            apply_force_bin (bins, i, NULL,davg,navg);
+          }
         }
 
 /*      for( int i = first; i < last; i++ )

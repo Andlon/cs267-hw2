@@ -1,0 +1,66 @@
+# Build Homework 2 on Hopper
+
+# Define include path
+INCLUDEPATH = include
+BINDIR = bin
+BUILDDIR = build
+SRC = src
+
+CC = g++
+MPCC = mpic++
+OPENMP = -fopenmp
+CFLAGS = -g -I$(INCLUDEPATH)
+LIBS = -lm
+
+# Define variables for the different targets to encompass build directory
+SERIAL_TARGET = $(BINDIR)/serial
+PTHREADS_TARGET = $(BINDIR)/pthreads
+OPENMP_TARGET = $(BINDIR)/openmp
+MPI_TARGET = $(BINDIR)/mpi
+AUTOGRADER_TARGET = $(BINDIR)/autograder
+
+TARGETS = $(SERIAL_TARGET) $(PTHREADS_TARGET) $(OPENMP_TARGET) $(MPI_TARGET) $(AUTOGRADER_TARGET)
+
+all:	$(TARGETS)
+
+pre-build:
+	mkdir -p build
+	mkdir -p bin
+
+$(SERIAL_TARGET): $(BUILDDIR)/serial.o $(BUILDDIR)/common.o $(INCLUDEPATH)/common.h
+	$(CC) -o $@ $(LIBS) $(BUILDDIR)/serial.o $(BUILDDIR)/common.o
+
+$(AUTOGRADER_TARGET): $(BUILDDIR)/autograder.o $(BUILDDIR)/common.o $(INCLUDEPATH)/common.h
+	$(CC) -o $@ $(LIBS) $(BUILDDIR)/autograder.o $(BUILDDIR)/common.o
+
+$(PTHREADS_TARGET): $(BUILDDIR)/pthreads.o $(BUILDDIR)/common.o $(INCLUDEPATH)/common.h
+	$(CC) -o $@ $(LIBS) -pthread $(BUILDDIR)/pthreads.o $(BUILDDIR)/common.o
+
+$(OPENMP_TARGET): $(BUILDDIR)/openmp.o $(BUILDDIR)/common.o $(INCLUDEPATH)/common.h
+	$(CC) -o $@ $(LIBS) $(OPENMP) $(BUILDDIR)/openmp.o $(BUILDDIR)/common.o
+
+$(MPI_TARGET): $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o $(INCLUDEPATH)/common.h
+	$(MPCC) -o $@ $(LIBS) $(MPILIBS) $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o
+
+# Build all object files (note: here we assume we want to use the same compiler flags for all objects)
+# We add pre-build as a dependency and filter it out when building as to make sure necessary directories exist
+$(BUILDDIR)/serial.o: $(SRC)/serial.cpp
+	$(CC) $(CFLAGS) $(OPENMP) -c $(SRC)/serial.cpp -o $(BUILDDIR)/serial.o
+
+$(BUILDDIR)/openmp.o: $(SRC)/openmp.cpp
+	$(CC) $(CFLAGS) $(OPENMP) -c $(SRC)/openmp.cpp -o $(BUILDDIR)/openmp.o
+
+$(BUILDDIR)/pthreads.o: $(SRC)/pthreads.cpp
+	$(CC) $(CFLAGS) $(OPENMP) -c $(SRC)/pthreads.cpp -o $(BUILDDIR)/pthreads.o
+
+$(BUILDDIR)/mpi.o: $(SRC)/mpi.cpp
+	$(MPCC) $(CFLAGS) $(OPENMP) -c $(SRC)/mpi.cpp -o $(BUILDDIR)/mpi.o
+
+$(BUILDDIR)/autograder.o: $(SRC)/autograder.cpp
+	$(CC) $(CFLAGS) $(OPENMP) -c $(SRC)/autograder.cpp -o $(BUILDDIR)/autograder.o
+
+$(BUILDDIR)/common.o: $(SRC)/common.cpp
+	$(CC) $(CFLAGS) $(OPENMP) -c $(SRC)/common.cpp -o $(BUILDDIR)/common.o
+
+clean:
+	rm -f $(BUILDDIR)/* $(TARGETS)
