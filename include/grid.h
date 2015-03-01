@@ -34,9 +34,9 @@ private:
     std::vector<particle_bin> bins;
 };
 
-void calculate_forces_for_grid(grid & grid);
-void calculate_forces_for_bin(grid & grid, size_t bin_id);
-void calculate_forces_for_particle(grid & grid, size_t bin_id, particle_t & particle);
+void calculate_forces_for_grid(grid & grid, double *dmin, double *davg, int *navg);
+void calculate_forces_for_bin(grid & grid, size_t bin_id, double *dmin, double *davg, int *navg);
+void calculate_forces_for_particle(grid & grid, size_t bin_id, particle_t & particle, double *dmin, double *davg, int *navg);
 size_t compute_bin_for_particle(const grid & grid, const particle_t & t);
 
 #endif //__CS267_GRID_H

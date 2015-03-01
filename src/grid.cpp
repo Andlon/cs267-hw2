@@ -104,16 +104,16 @@ void grid::distribute_particles(particle_t *particles, size_t count)
 }
 
 
-void calculate_forces_for_bin(grid &grid, size_t bin_id)
+void calculate_forces_for_bin(grid &grid, size_t bin_id, double *dmin, double *davg, int *navg)
 {
     assert(in_range(bin_id, 0, grid.bincount()));
     for (auto particle_pointer : grid[bin_id]) {
-        calculate_forces_for_particle(grid, bin_id, *particle_pointer);
+        calculate_forces_for_particle(grid, bin_id, *particle_pointer, dmin, davg, navg);
     }
 }
 
 
-void calculate_forces_for_particle(grid &grid, size_t bin_id, particle_t &particle)
+void calculate_forces_for_particle(grid &grid, size_t bin_id, particle_t &particle, double *dmin, double *davg, int *navg)
 {
     auto interacting_bins = acquire_interacting_bins(grid, bin_id);
     for (auto interacting_bin : interacting_bins) {
@@ -124,16 +124,16 @@ void calculate_forces_for_particle(grid &grid, size_t bin_id, particle_t &partic
             // Exclude self-interaction
             if (particle_pointer != &particle) {
                 // NOTE: Replace dmin, dmax etc. with real variables here asap
-                apply_force(particle, interacting_particle, 0, 0, 0);
+                apply_force(particle, interacting_particle, dmin, davg, navg);
             }
         }
     }
 }
 
 
-void calculate_forces_for_grid(grid &grid)
+void calculate_forces_for_grid(grid &grid, double *dmin, double *davg, int *navg)
 {
     for (size_t i = 0; i < grid.bincount(); ++i) {
-        calculate_forces_for_bin(grid, i);
+        calculate_forces_for_bin(grid, i, dmin, davg, navg);
     }
 }
