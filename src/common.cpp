@@ -107,7 +107,20 @@ void bin_particles( bin_t *bins, particle_t *particles, int n) {
   }
 }
 
-
+void bin_particles( bin_t *bins, particle_t *particles, int *particle_bin_ids, int n) {
+  for (int i = 0; i < n_bins_per_side; i++) {
+    for (int j = 0; j < n_bins_per_side; j++) {
+      bins[i*n_bins_per_side+j].clear();
+    }
+  }
+  for (int i = 0; i < n; i++) {
+    int bin_x_id = floor(particles[i].x / bin_size);
+    int bin_y_id = floor(particles[i].y / bin_size);
+    int bin_id = bin_x_id * n_bins_per_side + bin_y_id;
+    particle_bin_ids[i] = bin_id;
+    bins[bin_id].add_particle(particles+i);
+  }
+}
 //
 //  interact two particles
 //
@@ -142,16 +155,21 @@ void apply_force_bin( bin_t *bins, int bin_id, double *dmin, double &davg, int &
   if (bins[bin_id].num_particles() == 0) // nothing to apply
     return;
 
-  int bin_x_id = bin_id / n_bins_per_side;
-  int bin_y_id = bin_id % n_bins_per_side;
-
   for (int i = 0; i < bins[bin_id].num_particles(); i++) {
+    apply_force_particle_bin( *(bins[bin_id].particles[i]), bin_id, bins, dmin, davg, navg);
+  }
+}
+
+void apply_force_particle_bin( particle_t &particle, int bin_id, bin_t *bins, double *dmin, double &davg, int &navg) {
+    int bin_x_id = bin_id / n_bins_per_side;
+    int bin_y_id = bin_id % n_bins_per_side;
+
     // reset acceleration
-    bins[bin_id].particles[i]->ax = bins[bin_id].particles[i]->ay = 0;
+    particle.ax = particle.ay = 0;
 
     // apply force within bin
     for (int j = 0; j < bins[bin_id].num_particles(); j++) {
-      apply_force(*bins[bin_id].particles[i], *bins[bin_id].particles[j], dmin, davg, navg);
+      apply_force(particle, *bins[bin_id].particles[j], dmin, davg, navg);
     }
 
 
@@ -159,25 +177,25 @@ void apply_force_bin( bin_t *bins, int bin_id, double *dmin, double &davg, int &
     if (bin_x_id != 0) {
       int neighbor_id = bin_id - n_bins_per_side;
       for (int j = 0; j < bins[neighbor_id].num_particles(); j++) {
-        apply_force(*bins[bin_id].particles[i], *bins[neighbor_id].particles[j], dmin, davg, navg);
+        apply_force(particle, *bins[neighbor_id].particles[j], dmin, davg, navg);
       }
     }
     if (bin_x_id != n_bins_per_side-1) {
       int neighbor_id = bin_id + n_bins_per_side;
       for (int j = 0; j < bins[neighbor_id].num_particles(); j++) {
-        apply_force(*bins[bin_id].particles[i], *bins[neighbor_id].particles[j], dmin, davg, navg);
+        apply_force(particle, *bins[neighbor_id].particles[j], dmin, davg, navg);
       }
     }
     if (bin_y_id != 0) {
       int neighbor_id = bin_id - 1;
       for (int j = 0; j < bins[neighbor_id].num_particles(); j++) {
-        apply_force(*bins[bin_id].particles[i], *bins[neighbor_id].particles[j], dmin, davg, navg);
+        apply_force(particle, *bins[neighbor_id].particles[j], dmin, davg, navg);
       }
     }
     if (bin_y_id != n_bins_per_side-1) {
       int neighbor_id = bin_id + 1;
       for (int j = 0; j < bins[neighbor_id].num_particles(); j++) {
-        apply_force(*bins[bin_id].particles[i], *bins[neighbor_id].particles[j], dmin, davg, navg);
+        apply_force(particle, *bins[neighbor_id].particles[j], dmin, davg, navg);
       }
     }
 
@@ -185,28 +203,27 @@ void apply_force_bin( bin_t *bins, int bin_id, double *dmin, double &davg, int &
     if (bin_x_id != 0 && bin_y_id != 0) {
       int neighbor_id = bin_id - (n_bins_per_side + 1);
       for (int j = 0; j < bins[neighbor_id].num_particles(); j++) {
-        apply_force(*bins[bin_id].particles[i], *bins[neighbor_id].particles[j], dmin, davg, navg);
+        apply_force(particle, *bins[neighbor_id].particles[j], dmin, davg, navg);
       }
     }
     if (bin_x_id != 0 && bin_y_id != n_bins_per_side-1) {
       int neighbor_id = bin_id - (n_bins_per_side - 1);
       for (int j = 0; j < bins[neighbor_id].num_particles(); j++) {
-        apply_force(*bins[bin_id].particles[i], *bins[neighbor_id].particles[j], dmin, davg, navg);
+        apply_force(particle, *bins[neighbor_id].particles[j], dmin, davg, navg);
       }
     }
     if (bin_x_id != n_bins_per_side-1 && bin_y_id != 0) {
       int neighbor_id = bin_id + n_bins_per_side - 1;
       for (int j = 0; j < bins[neighbor_id].num_particles(); j++) {
-        apply_force(*bins[bin_id].particles[i], *bins[neighbor_id].particles[j], dmin, davg, navg);
+        apply_force(particle, *bins[neighbor_id].particles[j], dmin, davg, navg);
       }
     }
     if (bin_x_id != n_bins_per_side-1 && bin_y_id != n_bins_per_side-1) {
       int neighbor_id = bin_id + n_bins_per_side + 1;
       for (int j = 0; j < bins[neighbor_id].num_particles(); j++) {
-        apply_force(*bins[bin_id].particles[i], *bins[neighbor_id].particles[j], dmin, davg, navg);
+        apply_force(particle, *bins[neighbor_id].particles[j], dmin, davg, navg);
       }
     }
-  }
 }
 
 
