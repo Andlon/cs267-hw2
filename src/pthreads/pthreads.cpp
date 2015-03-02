@@ -4,7 +4,7 @@
 #include <math.h>
 #include <pthread.h>
 #include <assert.h>
-#include "common.h"
+#include "util/common.h"
 
 //
 //  global variables

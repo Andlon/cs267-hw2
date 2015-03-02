@@ -41,7 +41,7 @@ class bin_t
 private:
   std::vector<particle_t *> particles;
 public:
-  bin_t() { /*particles.resize(100);*/ }
+  bin_t() { particles.resize(100); }
   void add_particle(particle_t *particle) {
     particles.push_back(particle);
   }

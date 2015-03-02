@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
-#include "common.h"
+#include "util/common.h"
 #include "omp.h"
 
 //

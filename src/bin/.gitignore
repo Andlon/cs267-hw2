@@ -1,5 +1,6 @@
 # Ignore executables
 mpi
+mpi_naive
 openmp
 pthreads
 serial

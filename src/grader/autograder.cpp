@@ -3,7 +3,7 @@
 #include <assert.h>
 #include <math.h>
 #include <string.h>
-#include "common.h"
+#include "util/common.h"
 
 
 #define MAX_ENTRIES 100 
