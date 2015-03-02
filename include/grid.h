@@ -39,5 +39,7 @@ void compute_forces_for_bin(grid & grid, size_t bin_id, double *dmin, double *da
 void compute_forces_for_particle(grid & grid, size_t bin_id, particle_t & particle, double *dmin, double *davg, int *navg);
 size_t determine_bin_for_particle(const grid & grid, const particle_t & t);
 
+std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id);
+
 #endif //__CS267_GRID_H
 

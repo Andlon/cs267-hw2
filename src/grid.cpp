@@ -18,11 +18,13 @@ int computeNumberOfBins(double size, double minimum_bin_size) {
     return static_cast<int> (size / minimum_bin_size);
 }
 
+}
+
 std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id) {
     assert(bin_id < grid.bincount());
 
-    int x0 = ((int) bin_id % grid.bins_per_dimension);
-    int y0 = ((int) bin_id / grid.bins_per_dimension);
+    int x0 = ((int) bin_id) % grid.bins_per_dimension;
+    int y0 = ((int) bin_id) / grid.bins_per_dimension;
 
     // All coordinates of neighboring bins, including this bin
     std::array<std::pair<int, int>, 9> bins_xy = {{
@@ -38,22 +40,20 @@ std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id) {
     }};
 
     // Transform coordinates to indices, filtering out non-existent bins
-    std::vector<size_t> bin_ids(9);
+    std::vector<size_t> bin_ids;
     for (const auto & coord : bins_xy)
     {
         int x = coord.first;
         int y = coord.second;
-        if (    in_range(x, 0, grid.binsize_per_dimension) &&
-                in_range(y, 0, grid.binsize_per_dimension))
+        if (    in_range(x, 0, grid.bins_per_dimension) &&
+                in_range(y, 0, grid.bins_per_dimension))
         {
-            size_t id = static_cast<size_t> (coord.first + coord.second * grid.binsize_per_dimension);
+            size_t id = static_cast<size_t> (coord.first + coord.second * grid.bins_per_dimension);
             bin_ids.push_back(id);
         }
     }
 
     return bin_ids;
-}
-
 }
 
 // Note:
@@ -115,6 +115,8 @@ void compute_forces_for_bin(grid &grid, size_t bin_id, double *dmin, double *dav
 
 void compute_forces_for_particle(grid &grid, size_t bin_id, particle_t &particle, double *dmin, double *davg, int *navg)
 {
+    particle.ax = particle.ay = 0;
+
     auto interacting_bins = acquire_interacting_bins(grid, bin_id);
     for (auto interacting_bin : interacting_bins) {
         particle_bin & bin = grid[interacting_bin];
