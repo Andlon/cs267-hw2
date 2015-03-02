@@ -1,6 +1,6 @@
 # Build Homework 2 on Hopper
 
-# Include compiler-specific (gcc or CC)
+# Include compiler-specifics (gcc or CC)
 ifdef COMPILER
 include $(COMPILER).make
 else
@@ -25,12 +25,15 @@ TARGETS = $(SERIAL_TARGET) $(PTHREADS_TARGET) $(OPENMP_TARGET) $(MPI_TARGET) $(A
 # Define build targets
 all:	$(TARGETS)
 
+debug: 	CFLAGS = $(DEBUG_CFLAGS)
+debug: $(TARGETS)
+
 pre-build:
 	mkdir -p build
 	mkdir -p bin
 
-$(SERIAL_TARGET): $(BUILDDIR)/serial.o $(BUILDDIR)/common.o
-	$(CC) -o $@ $(BUILDDIR)/serial.o $(BUILDDIR)/common.o $(LIBS) 
+$(SERIAL_TARGET): $(BUILDDIR)/grid.o $(BUILDDIR)/serial.o $(BUILDDIR)/common.o 
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@  
 
 $(AUTOGRADER_TARGET): $(BUILDDIR)/autograder.o $(BUILDDIR)/common.o
 	$(CC) -o $@ $(BUILDDIR)/autograder.o $(BUILDDIR)/common.o $(LIBS) 
