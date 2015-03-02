@@ -16,11 +16,11 @@ inline bool in_range(int x, int a, int b)
 
 class grid {
 public:
-    grid(double size, double minimum_bin_size);
+    grid(double gridsize, double minimum_bin_size);
 
     const size_t bins_per_dimension;
-    const size_t binsize_per_dimension;
-    const size_t size;
+    const double binsize_per_dimension;
+    const double size;
 
     size_t bincount() const;
 
@@ -34,10 +34,10 @@ private:
     std::vector<particle_bin> bins;
 };
 
-void calculate_forces_for_grid(grid & grid, double *dmin, double *davg, int *navg);
-void calculate_forces_for_bin(grid & grid, size_t bin_id, double *dmin, double *davg, int *navg);
-void calculate_forces_for_particle(grid & grid, size_t bin_id, particle_t & particle, double *dmin, double *davg, int *navg);
-size_t compute_bin_for_particle(const grid & grid, const particle_t & t);
+void compute_forces_for_grid(grid & grid, double *dmin, double *davg, int *navg);
+void compute_forces_for_bin(grid & grid, size_t bin_id, double *dmin, double *davg, int *navg);
+void compute_forces_for_particle(grid & grid, size_t bin_id, particle_t & particle, double *dmin, double *davg, int *navg);
+size_t determine_bin_for_particle(const grid & grid, const particle_t & t);
 
 #endif //__CS267_GRID_H
 

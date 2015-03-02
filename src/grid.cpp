@@ -61,17 +61,17 @@ std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id) {
 // binsize_per_dimension, as if the definition in the header file
 // is accidentally reordered, it may introduce an insidious bug. Hence,
 // we use the computeNumberOfBins function to compute every time.
-grid::grid(double size, double minimum_bin_size)
-    : bins_per_dimension(computeNumberOfBins(size, minimum_bin_size)),
-      binsize_per_dimension( size / computeNumberOfBins(size, minimum_bin_size) ),
-      size(size)
+grid::grid(double gridsize, double minimum_bin_size)
+    : bins_per_dimension(computeNumberOfBins(gridsize, minimum_bin_size)),
+      binsize_per_dimension( gridsize / computeNumberOfBins(gridsize, minimum_bin_size) ),
+      size(gridsize)
 {
     bins.resize(bincount());
 }
 
 size_t grid::bincount() const
 {
-    return binsize_per_dimension * binsize_per_dimension;
+    return bins_per_dimension * bins_per_dimension;
 }
 
 particle_bin &grid::operator()(int x, int y) {
@@ -98,22 +98,22 @@ void grid::distribute_particles(particle_t *particles, size_t count)
 {
     for (size_t i = 0; i < count; ++i) {
         particle_t * particle = particles + i;
-        size_t bin = compute_bin_for_particle(*this, *particle);
+        size_t bin = determine_bin_for_particle(*this, *particle);
         bins[bin].push_back(particle);
     }
 }
 
 
-void calculate_forces_for_bin(grid &grid, size_t bin_id, double *dmin, double *davg, int *navg)
+void compute_forces_for_bin(grid &grid, size_t bin_id, double *dmin, double *davg, int *navg)
 {
     assert(in_range(bin_id, 0, grid.bincount()));
     for (auto particle_pointer : grid[bin_id]) {
-        calculate_forces_for_particle(grid, bin_id, *particle_pointer, dmin, davg, navg);
+        compute_forces_for_particle(grid, bin_id, *particle_pointer, dmin, davg, navg);
     }
 }
 
 
-void calculate_forces_for_particle(grid &grid, size_t bin_id, particle_t &particle, double *dmin, double *davg, int *navg)
+void compute_forces_for_particle(grid &grid, size_t bin_id, particle_t &particle, double *dmin, double *davg, int *navg)
 {
     auto interacting_bins = acquire_interacting_bins(grid, bin_id);
     for (auto interacting_bin : interacting_bins) {
@@ -131,9 +131,24 @@ void calculate_forces_for_particle(grid &grid, size_t bin_id, particle_t &partic
 }
 
 
-void calculate_forces_for_grid(grid &grid, double *dmin, double *davg, int *navg)
+void compute_forces_for_grid(grid &grid, double *dmin, double *davg, int *navg)
 {
     for (size_t i = 0; i < grid.bincount(); ++i) {
-        calculate_forces_for_bin(grid, i, dmin, davg, navg);
+        compute_forces_for_bin(grid, i, dmin, davg, navg);
     }
+}
+
+
+size_t determine_bin_for_particle(const grid &grid, const particle_t &t)
+{
+    assert(t.x >= 0);
+    assert(t.x <= grid.size);
+    assert(t.y >= 0);
+    assert(t.y <= grid.size);
+
+    // Place particle in bin determined by x, y coordinates
+    int x = static_cast<int> (t.x / grid.binsize_per_dimension);
+    int y = static_cast<int> (t.y / grid.binsize_per_dimension);
+
+    return x + y * grid.bins_per_dimension;
 }
