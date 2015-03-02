@@ -184,3 +184,15 @@ char *read_string( int argc, char **argv, const char *option, char *default_valu
         return argv[iplace+1];
     return default_value;
 }
+
+
+double get_size()
+{
+    return size;
+}
+
+
+double get_cutoff()
+{
+    return cutoff;
+}
