@@ -2,7 +2,8 @@
 #include <stdio.h>
 #include <assert.h>
 #include <math.h>
-#include "common.h"
+#include <common.h>
+#include <grid.h>
 
 //
 //  benchmarking program
@@ -34,49 +35,46 @@ int main( int argc, char **argv )
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
     set_size( n );
     init_particles( n, particles );
+
+    grid particle_grid(get_size(), get_cutoff());
     
     //
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
-	
+
     for( int step = 0; step < NSTEPS; step++ )
     {
-	navg = 0;
+        // Reset statistical variables
+        navg = 0;
         davg = 0.0;
-	dmin = 1.0;
-        //
-        //  compute forces
-        //
-        for( int i = 0; i < n; i++ )
-        {
-            particles[i].ax = particles[i].ay = 0;
-            for (int j = 0; j < n; j++ )
-				apply_force( particles[i], particles[j],&dmin,&davg,&navg);
-        }
- 
-        //
+        dmin = 1.0;
+
+        // Distribute and compute forces
+        particle_grid.clear_particles();
+        particle_grid.distribute_particles(particles, n);
+        compute_forces_for_grid(particle_grid, &dmin, &davg, &navg);
+
         //  move particles
-        //
-        for( int i = 0; i < n; i++ ) 
-            move( particles[i] );		
+        for( int i = 0; i < n; i++ )
+            move( particles[i] );
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
-          //
-          // Computing statistical data
-          //
-          if (navg) {
-            absavg +=  davg/navg;
-            nabsavg++;
-          }
-          if (dmin < absmin) absmin = dmin;
-		
-          //
-          //  save if necessary
-          //
-          if( fsave && (step%SAVEFREQ) == 0 )
-              save( fsave, n, particles );
+            //
+            // Computing statistical data
+            //
+            if (navg) {
+                absavg +=  davg/navg;
+                nabsavg++;
+            }
+            if (dmin < absmin) absmin = dmin;
+
+            //
+            //  save if necessary
+            //
+            if( fsave && (step%SAVEFREQ) == 0 )
+                save( fsave, n, particles );
         }
     }
     simulation_time = read_timer( ) - simulation_time;
@@ -85,31 +83,31 @@ int main( int argc, char **argv )
 
     if( find_option( argc, argv, "-no" ) == -1 )
     {
-      if (nabsavg) absavg /= nabsavg;
-    // 
-    //  -the minimum distance absmin between 2 particles during the run of the simulation
-    //  -A Correct simulation will have particles stay at greater than 0.4 (of cutoff) with typical values between .7-.8
-    //  -A simulation were particles don't interact correctly will be less than 0.4 (of cutoff) with typical values between .01-.05
-    //
-    //  -The average distance absavg is ~.95 when most particles are interacting correctly and ~.66 when no particles are interacting
-    //
-    printf( ", absmin = %lf, absavg = %lf", absmin, absavg);
-    if (absmin < 0.4) printf ("\nThe minimum distance is below 0.4 meaning that some particle is not interacting");
-    if (absavg < 0.8) printf ("\nThe average distance is below 0.8 meaning that most particles are not interacting");
+        if (nabsavg) absavg /= nabsavg;
+        //
+        //  -the minimum distance absmin between 2 particles during the run of the simulation
+        //  -A Correct simulation will have particles stay at greater than 0.4 (of cutoff) with typical values between .7-.8
+        //  -A simulation were particles don't interact correctly will be less than 0.4 (of cutoff) with typical values between .01-.05
+        //
+        //  -The average distance absavg is ~.95 when most particles are interacting correctly and ~.66 when no particles are interacting
+        //
+        printf( ", absmin = %lf, absavg = %lf", absmin, absavg);
+        if (absmin < 0.4) printf ("\nThe minimum distance is below 0.4 meaning that some particle is not interacting");
+        if (absavg < 0.8) printf ("\nThe average distance is below 0.8 meaning that most particles are not interacting");
     }
-    printf("\n");     
+    printf("\n");
 
     //
     // Printing summary data
     //
-    if( fsum) 
+    if( fsum)
         fprintf(fsum,"%d %g\n",n,simulation_time);
- 
+
     //
     // Clearing space
     //
     if( fsum )
-        fclose( fsum );    
+        fclose( fsum );
     free( particles );
     if( fsave )
         fclose( fsave );
