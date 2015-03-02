@@ -5,6 +5,9 @@ pthreads
 serial
 autograder
 
+# Ignore test binaries
+test/
+
 # Ignore output from jobs
 mpi.txt
 *.stdout
