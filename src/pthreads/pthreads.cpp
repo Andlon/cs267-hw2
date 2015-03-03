@@ -6,6 +6,7 @@
 #include <assert.h>
 #include "util/common.h"
 
+
 //
 //  global variables
 //
@@ -34,13 +35,13 @@ void *thread_routine( void *pthread_id )
     int thread_id = *(int*)pthread_id;
 
     int particles_per_thread = (n + n_threads - 1) / n_threads;
-    int first = min(  thread_id    * particles_per_thread, n );
-    int last  = min( (thread_id+1) * particles_per_thread, n );
+    int first = mymin(  thread_id    * particles_per_thread, n );
+    int last  = mymin( (thread_id+1) * particles_per_thread, n );
 
     int n_bins_per_side = sqrt(n_bins);
     int bins_per_thread = (n_bins + n_threads - 1) / n_threads;
-    int first_bin = min(  thread_id    * bins_per_thread, n_bins );
-    int last_bin = min( (thread_id+1) * bins_per_thread, n_bins );
+    int first_bin = mymin(  thread_id    * bins_per_thread, n_bins );
+    int last_bin = mymin( (thread_id+1) * bins_per_thread, n_bins );
     
     //
     //  simulate a number of time steps

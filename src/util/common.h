@@ -13,9 +13,8 @@
 #ifndef __CS267_COMMON_H__
 #define __CS267_COMMON_H__
 
-inline int min( int a, int b ) { return a < b ? a : b; }
-inline int max( int a, int b ) { return a > b ? a : b; }
-
+inline int mymin( int a, int b ) { return a < b ? a : b; }
+inline int mymax( int a, int b ) { return a > b ? a : b; }
 //
 //  saving parameters
 //

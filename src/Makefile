@@ -1,7 +1,7 @@
 
 SHELL := /bin/bash
 
-SUBDIRS = util serial openmp pthreads mpi grader
+SUBDIRS = util serial openmp pthreads mpi grader gpu
 
 all: $(SUBDIRS)
 	-echo Done

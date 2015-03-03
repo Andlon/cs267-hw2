@@ -5,7 +5,8 @@ openmp
 pthreads
 serial
 autograder
+gpu
 
 # Ignore output from jobs
-mpi.txt
+*.txt
 *.stdout
