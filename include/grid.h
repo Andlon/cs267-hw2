@@ -20,7 +20,7 @@ inline bool in_range(int x, int a, int b)
 
 class grid {
 public:
-    grid(double gridsize, double minimum_bin_size);
+    grid(int particle_count, double gridsize, double minimum_bin_size);
 
     // Total number of bins (bins_per_dim()^2)
     size_t bincount() const;

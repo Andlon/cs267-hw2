@@ -36,7 +36,7 @@ int main( int argc, char **argv )
     set_size( n );
     init_particles( n, particles );
 
-    grid particle_grid(get_size(), get_cutoff());
+    grid particle_grid(n, get_size(), get_cutoff());
     
     //
     //  simulate a number of time steps
