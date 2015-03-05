@@ -6,11 +6,7 @@
 
 namespace {
 
-inline int computeIndex(int x, int y, int width) {
-    return x + width * y;
-}
-
-int computeNumberOfBins(double size, double minimum_bin_size) {
+int compute_bins_per_dimension(double size, double minimum_bin_size) {
     assert(size > 0);
     assert(minimum_bin_size > 0);
     minimum_bin_size = std::min(size, minimum_bin_size);
@@ -22,8 +18,8 @@ int computeNumberOfBins(double size, double minimum_bin_size) {
 std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id) {
     assert(bin_id < grid.bincount());
 
-    int x0 = ((int) bin_id) % grid.bins_per_dimension;
-    int y0 = ((int) bin_id) / grid.bins_per_dimension;
+    int x0 = ((int) bin_id) % grid.bins_per_dim();
+    int y0 = ((int) bin_id) / grid.bins_per_dim();
 
     // All coordinates of neighboring bins, including this bin
     std::pair<int, int> bins_xy[] = {
@@ -44,10 +40,10 @@ std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id) {
     {
         int x = coord.first;
         int y = coord.second;
-        if (    in_range(x, 0, grid.bins_per_dimension) &&
-                in_range(y, 0, grid.bins_per_dimension))
+        if (    in_range(x, 0, grid.bins_per_dim()) &&
+                in_range(y, 0, grid.bins_per_dim()))
         {
-            size_t id = static_cast<size_t> (coord.first + coord.second * grid.bins_per_dimension);
+            size_t id = static_cast<size_t> (coord.first + coord.second * grid.bins_per_dim());
             bin_ids.push_back(id);
         }
     }
@@ -55,47 +51,54 @@ std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id) {
     return bin_ids;
 }
 
-void setup_bins(const grid & grid, std::vector<particle_bin> & bins) {
+void assign_neighbors_to_bins(const grid & grid, std::vector<particle_bin> & bins) {
     for (size_t i = 0; i < bins.size(); ++i)
         bins[i].neighbors = acquire_interacting_bins(grid, i);
 }
 
-// Note:
-// avoid using bins_per_dimension in the definition of
-// binsize_per_dimension, as if the definition in the header file
-// is accidentally reordered, it may introduce an insidious bug. Hence,
-// we use the computeNumberOfBins function to compute every time.
 grid::grid(double gridsize, double minimum_bin_size)
-    : bins_per_dimension(computeNumberOfBins(gridsize, minimum_bin_size)),
-      binsize_per_dimension( gridsize / computeNumberOfBins(gridsize, minimum_bin_size) ),
-      size(gridsize)
+    : _bins_per_dim(compute_bins_per_dimension(gridsize, minimum_bin_size)),
+      _size(gridsize)
 {
-    bins.resize(bincount());
-    setup_bins(*this, bins);
+    _binsize = _size / _bins_per_dim;
+
+    _bins.resize(bincount());
+    assign_neighbors_to_bins(*this, _bins);
 }
 
 size_t grid::bincount() const
 {
-    return bins_per_dimension * bins_per_dimension;
+    return bins_per_dim() * bins_per_dim();
 }
 
-particle_bin &grid::operator()(int x, int y) {
-    assert(x >= 0);
-    assert(x < bins_per_dimension);
-    assert(y >= 0);
-    assert(y < bins_per_dimension);
-    return bins[x + bins_per_dimension * y];
+size_t grid::bins_per_dim() const
+{
+    return _bins_per_dim;
 }
 
+double grid::binsize() const
+{
+    return _binsize;
+}
+
+double grid::size() const
+{
+    return _size;
+}
 
 particle_bin &grid::operator[](size_t bin_id) {
-    assert(bin_id < bins.size());
-    return bins[bin_id];
+    assert(bin_id < _bins.size());
+    return _bins[bin_id];
+}
+
+const particle_bin &grid::operator[](size_t bin_id) const
+{
+    return const_cast<const particle_bin &>((*this)[bin_id]);
 }
 
 void grid::clear_particles()
 {
-    for (auto & bin : bins)
+    for (auto & bin : _bins)
         bin.particles.clear();
 }
 
@@ -104,10 +107,9 @@ void grid::distribute_particles(particle_t *particles, size_t count)
     for (size_t i = 0; i < count; ++i) {
         particle_t * particle = particles + i;
         size_t bin = determine_bin_for_particle(*this, *particle);
-        bins[bin].particles.push_back(particle);
+        _bins[bin].particles.push_back(particle);
     }
 }
-
 
 void compute_forces_for_bin(grid &grid, size_t bin_id, double *dmin, double *davg, int *navg)
 {
@@ -149,13 +151,13 @@ void compute_forces_for_grid(grid &grid, double *dmin, double *davg, int *navg)
 size_t determine_bin_for_particle(const grid &grid, const particle_t &t)
 {
     assert(t.x >= 0);
-    assert(t.x <= grid.size);
+    assert(t.x <= grid.size());
     assert(t.y >= 0);
-    assert(t.y <= grid.size);
+    assert(t.y <= grid.size());
 
     // Place particle in bin determined by x, y coordinates
-    int x = static_cast<int> (t.x / grid.binsize_per_dimension);
-    int y = static_cast<int> (t.y / grid.binsize_per_dimension);
+    int x = static_cast<int> (t.x / grid.binsize());
+    int y = static_cast<int> (t.y / grid.binsize());
 
-    return x + y * grid.bins_per_dimension;
+    return static_cast<size_t>(x + y * grid.bins_per_dim());
 }

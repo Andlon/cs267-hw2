@@ -22,20 +22,30 @@ class grid {
 public:
     grid(double gridsize, double minimum_bin_size);
 
-    const size_t bins_per_dimension;
-    const double binsize_per_dimension;
-    const double size;
-
+    // Total number of bins (bins_per_dim()^2)
     size_t bincount() const;
 
-    particle_bin & operator() (int x, int y);
-    particle_bin & operator[] (size_t bin_id);
+    // Number of bins in one dimension
+    size_t bins_per_dim() const;
+
+    // Physical size of an individual bin in one dimension.
+    double binsize() const;
+
+    // Physical size of grid in one dimension.
+    double size() const;
 
     void clear_particles();
     void distribute_particles(particle_t * particles, size_t count);
 
+    particle_bin & operator[] (size_t bin_id);
+    const particle_bin & operator[] (size_t bin_id) const;
+
 private:
-    std::vector<particle_bin> bins;
+    size_t _bins_per_dim;
+    double _binsize;
+    double _size;
+
+    std::vector<particle_bin> _bins;
 };
 
 void compute_forces_for_grid(grid & grid, double *dmin, double *davg, int *navg);

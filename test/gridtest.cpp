@@ -8,12 +8,12 @@ TEST_CASE("grid class members", "[grid]") {
         grid grid(3.2, 1.0);
 
         SECTION("size is correct") {
-            REQUIRE(grid.size == 3.2);
+            REQUIRE(grid.size() == 3.2);
         }
 
         SECTION("basic bin division") {
-            REQUIRE(grid.bins_per_dimension == 3);
-            REQUIRE(grid.binsize_per_dimension == Approx(3.2 / 3));
+            REQUIRE(grid.bins_per_dim() == 3);
+            REQUIRE(grid.binsize() == Approx(3.2 / 3));
         }
 
         SECTION("bin count") {
