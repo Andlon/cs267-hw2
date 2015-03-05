@@ -5,7 +5,11 @@
 #include <cstdio>
 #include "common.h"
 
-typedef std::vector<particle_t *> particle_bin;
+struct particle_bin {
+    // Note that this bin itself is included in its own neighborhood
+    std::vector<size_t>         neighbors;
+    std::vector<particle_t *>   particles;
+};
 
 // Returns true if x is in the (half-open) interval [a, b).
 // (Yeah, it doesn't really belong here semantically speaking)

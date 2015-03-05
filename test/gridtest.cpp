@@ -36,17 +36,17 @@ TEST_CASE("grid class members", "[grid]") {
         REQUIRE(grid.bincount() == 4);
 
         // Check that the particles reside in each their own bin
-        REQUIRE(grid[0].size() == 1);
-        REQUIRE(grid[0].front() == particles);
+        REQUIRE(grid[0].particles.size() == 1);
+        REQUIRE(grid[0].particles.front() == particles);
 
-        REQUIRE(grid[1].size() == 1);
-        REQUIRE(grid[1].front() == particles + 1);
+        REQUIRE(grid[1].particles.size() == 1);
+        REQUIRE(grid[1].particles.front() == particles + 1);
 
-        REQUIRE(grid[2].size() == 1);
-        REQUIRE(grid[2].front() == particles + 2);
+        REQUIRE(grid[2].particles.size() == 1);
+        REQUIRE(grid[2].particles.front() == particles + 2);
 
-        REQUIRE(grid[3].size() == 1);
-        REQUIRE(grid[3].front() == particles + 3);
+        REQUIRE(grid[3].particles.size() == 1);
+        REQUIRE(grid[3].particles.front() == particles + 3);
     }
 }
 

@@ -55,6 +55,11 @@ std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id) {
     return bin_ids;
 }
 
+void setup_bins(const grid & grid, std::vector<particle_bin> & bins) {
+    for (size_t i = 0; i < bins.size(); ++i)
+        bins[i].neighbors = acquire_interacting_bins(grid, i);
+}
+
 // Note:
 // avoid using bins_per_dimension in the definition of
 // binsize_per_dimension, as if the definition in the header file
@@ -66,6 +71,7 @@ grid::grid(double gridsize, double minimum_bin_size)
       size(gridsize)
 {
     bins.resize(bincount());
+    setup_bins(*this, bins);
 }
 
 size_t grid::bincount() const
@@ -90,7 +96,7 @@ particle_bin &grid::operator[](size_t bin_id) {
 void grid::clear_particles()
 {
     for (auto & bin : bins)
-        bin.clear();
+        bin.particles.clear();
 }
 
 void grid::distribute_particles(particle_t *particles, size_t count)
@@ -98,7 +104,7 @@ void grid::distribute_particles(particle_t *particles, size_t count)
     for (size_t i = 0; i < count; ++i) {
         particle_t * particle = particles + i;
         size_t bin = determine_bin_for_particle(*this, *particle);
-        bins[bin].push_back(particle);
+        bins[bin].particles.push_back(particle);
     }
 }
 
@@ -106,7 +112,7 @@ void grid::distribute_particles(particle_t *particles, size_t count)
 void compute_forces_for_bin(grid &grid, size_t bin_id, double *dmin, double *davg, int *navg)
 {
     assert(in_range(bin_id, 0, grid.bincount()));
-    for (auto particle_pointer : grid[bin_id]) {
+    for (auto particle_pointer : grid[bin_id].particles) {
         compute_forces_for_particle(grid, bin_id, *particle_pointer, dmin, davg, navg);
     }
 }
@@ -116,10 +122,10 @@ void compute_forces_for_particle(grid &grid, size_t bin_id, particle_t &particle
 {
     particle.ax = particle.ay = 0;
 
-    auto interacting_bins = acquire_interacting_bins(grid, bin_id);
-    for (auto interacting_bin : interacting_bins) {
+    auto & bin = grid[bin_id];
+    for (auto interacting_bin : bin.neighbors) {
         particle_bin & bin = grid[interacting_bin];
-        for (auto particle_pointer : bin) {
+        for (auto particle_pointer : bin.particles) {
             particle_t & interacting_particle = *particle_pointer;
 
             // Exclude self-interaction
