@@ -3,7 +3,6 @@
 #include <cmath>
 #include <algorithm>
 #include <iterator>
-#include <array>
 
 namespace {
 
@@ -27,7 +26,7 @@ std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id) {
     int y0 = ((int) bin_id) / grid.bins_per_dimension;
 
     // All coordinates of neighboring bins, including this bin
-    std::array<std::pair<int, int>, 9> bins_xy = {{
+    std::pair<int, int> bins_xy[] = {
         { x0 - 1, y0 - 1 },
         { x0,     y0 - 1 },
         { x0 + 1, y0 - 1 },
@@ -37,7 +36,7 @@ std::vector<size_t> acquire_interacting_bins(const grid & grid, size_t bin_id) {
         { x0 - 1, y0 + 1 },
         { x0,     y0 + 1 },
         { x0 + 1, y0 + 1 }
-    }};
+    };
 
     // Transform coordinates to indices, filtering out non-existent bins
     std::vector<size_t> bin_ids;
