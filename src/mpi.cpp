@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
+#include <grid.h>
 #include "common.h"
 
 //
@@ -78,6 +79,9 @@ int main( int argc, char **argv )
     if( rank == 0 )
         init_particles( n, particles );
     MPI_Scatterv( particles, partition_sizes, partition_offsets, PARTICLE, local, nlocal, PARTICLE, 0, MPI_COMM_WORLD );
+
+    // Initialize particle grid
+    grid particle_grid(n, get_size(), get_cutoff());
     
     //
     //  simulate a number of time steps
@@ -99,15 +103,17 @@ int main( int argc, char **argv )
         if( find_option( argc, argv, "-no" ) == -1 )
           if( fsave && (step%SAVEFREQ) == 0 )
             save( fsave, n, particles );
-        
-        //
-        //  compute all forces
-        //
+
+        // Distribute and compute forces
+        particle_grid.clear_particles();
+        particle_grid.distribute_particles(particles, n);
         for( int i = 0; i < nlocal; i++ )
         {
-            local[i].ax = local[i].ay = 0;
-            for (int j = 0; j < n; j++ )
-                apply_force( local[i], particles[j], &dmin, &davg, &navg );
+            particle_t & particle = local[i];
+            compute_forces_for_particle(particle_grid,
+                                        determine_bin_for_particle(particle_grid, particle),
+                                        particle,
+                                        &dmin, &davg, &navg);
         }
      
         if( find_option( argc, argv, "-no" ) == -1 )

@@ -53,8 +53,8 @@ $(PTHREADS_TARGET): $(BUILDDIR)/pthreads.o $(BUILDDIR)/common.o
 $(OPENMP_TARGET): $(BUILDDIR)/openmp.o $(BUILDDIR)/common.o
 	$(CC) -o $@ $(OPENMP) $(BUILDDIR)/openmp.o $(BUILDDIR)/common.o $(LIBS) 
 
-$(MPI_TARGET): $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o
-	$(MPCC) -o $@ $(MPILIBS) $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o $(LIBS) 
+$(MPI_TARGET): $(BUILDDIR)/grid.o $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o
+	$(MPCC) $(CFLAGS) $^ $(LIBS) $(MPILIBS) -o $@
 
 # Tests
 $(GRIDTEST): $(BUILDDIR)/common.o $(BUILDDIR)/grid.o $(BUILDDIR)/test/catch.o $(BUILDDIR)/test/gridtest.o
@@ -74,7 +74,7 @@ $(BUILDDIR)/pthread_barrier.o: $(SRC)/pthread_barrier.c include/pthread_barrier.
 	$(CC) $(CFLAGS) -c $(SRC)/pthread_barrier.c -o $@
 
 $(BUILDDIR)/mpi.o: $(SRC)/mpi.cpp
-	$(MPCC) $(CFLAGS) -c $? -o $@
+	$(MPCC) $(CFLAGS) -c $? $(LIBS) $(MPILIBS) -o $@
 
 $(BUILDDIR)/%.o: $(SRC)/%.cpp
 	$(CC) $(CFLAGS) -c $? -o $@
