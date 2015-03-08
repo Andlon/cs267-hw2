@@ -1,5 +1,6 @@
 #include <catch.hpp>
 #include <grid.h>
+#include <spatial_partition.h>
 #include <algorithm>
 
 TEST_CASE("grid class members", "[grid]") {
@@ -20,34 +21,6 @@ TEST_CASE("grid class members", "[grid]") {
             REQUIRE(grid.bincount() == 9);
         }
     }
-
-    SECTION("distribution") {
-        grid grid(1.0, 0.45);
-
-        // Place one particle in each quadrant
-        particle_t particles[] = {
-            { 0.1, 0.1 },
-            { 0.8, 0.1 },
-            { 0.1, 0.8 },
-            { 0.8, 0.8 }
-        };
-
-        grid.distribute_particles(particles, 4);
-        REQUIRE(grid.bincount() == 4);
-
-        // Check that the particles reside in each their own bin
-        REQUIRE(grid[0].particles.size() == 1);
-        REQUIRE(grid[0].particles.front() == particles);
-
-        REQUIRE(grid[1].particles.size() == 1);
-        REQUIRE(grid[1].particles.front() == particles + 1);
-
-        REQUIRE(grid[2].particles.size() == 1);
-        REQUIRE(grid[2].particles.front() == particles + 2);
-
-        REQUIRE(grid[3].particles.size() == 1);
-        REQUIRE(grid[3].particles.front() == particles + 3);
-    }
 }
 
 TEST_CASE("associated algorithms") {
@@ -65,5 +38,38 @@ TEST_CASE("associated algorithms") {
         REQUIRE(bins1 == expected);
         REQUIRE(bins2 == expected);
         REQUIRE(bins3 == expected);
+    }
+}
+
+TEST_CASE("spatial_partition") {
+    SECTION("partition") {
+        grid grid(1.0, 0.45);
+        partitioned_storage storage(grid);
+
+        std::vector<particle_t> particles = {
+            { 0.1, 0.1 },
+            { 0.8, 0.1 },
+            { 0.1, 0.8 },
+            { 0.8, 0.8 }
+        };
+
+        storage.particles = particles;
+        partition(storage, grid);
+
+        REQUIRE(storage.particles.size() == 4);
+
+        REQUIRE(storage.particles[0].x == Approx(0.1));
+        REQUIRE(storage.particles[0].y == Approx(0.1));
+        REQUIRE(storage.particles[1].x == Approx(0.8));
+        REQUIRE(storage.particles[1].y == Approx(0.1));
+        REQUIRE(storage.particles[2].x == Approx(0.1));
+        REQUIRE(storage.particles[2].y == Approx(0.8));
+        REQUIRE(storage.particles[3].x == Approx(0.8));
+        REQUIRE(storage.particles[3].y == Approx(0.8));
+
+        REQUIRE(storage.partitions[0] == 1);
+        REQUIRE(storage.partitions[1] == 2);
+        REQUIRE(storage.partitions[2] == 3);
+        REQUIRE(storage.partitions[3] == 4);
     }
 }
