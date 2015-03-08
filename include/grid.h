@@ -20,7 +20,8 @@ inline bool in_range(int x, int a, int b)
 
 class grid {
 public:
-    grid(int particle_count, double gridsize, double minimum_bin_size);
+    grid(double gridsize, double minimum_bin_size);
+    grid(size_t particle_count, double gridsize, double minimum_bin_size);
 
     // Total number of bins (bins_per_dim()^2)
     size_t bincount() const;
@@ -34,6 +35,9 @@ public:
     // Physical size of grid in one dimension.
     double size() const;
 
+    // Number of particles on grid
+    size_t particle_count() const;
+
     void clear_particles();
     void distribute_particles(particle_t * particles, size_t count);
 
@@ -42,6 +46,7 @@ public:
 
 private:
     size_t _bins_per_dim;
+    size_t _particle_count;
     double _binsize;
     double _size;
 

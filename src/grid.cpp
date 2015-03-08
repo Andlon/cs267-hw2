@@ -12,11 +12,14 @@ int compute_bins_per_dimension(int particle_count, double size, double minimum_b
     assert(size > 0);
     assert(minimum_bin_size > 0);
 
-    double density = particle_count / (size * size);
-    int expected_bin_particle_count = density * (minimum_bin_size * minimum_bin_size);
-    int desired_bin_particle_count = std::max(expected_bin_particle_count, MINIMUM_PARTICLES_PER_BIN);
+    if (particle_count > 0) {
+        double density = particle_count / (size * size);
+        int expected_bin_particle_count = density * (minimum_bin_size * minimum_bin_size);
+        int desired_bin_particle_count = std::max(expected_bin_particle_count, MINIMUM_PARTICLES_PER_BIN);
 
-    minimum_bin_size = sqrt(desired_bin_particle_count / density);
+        minimum_bin_size = sqrt(desired_bin_particle_count / density);
+    }
+
     minimum_bin_size = std::min(size, minimum_bin_size);
 
     return static_cast<int> (size / minimum_bin_size);
@@ -65,8 +68,17 @@ void assign_neighbors_to_bins(const grid & grid, std::vector<particle_bin> & bin
         bins[i].neighbors = acquire_interacting_bins(grid, i);
 }
 
-grid::grid(int particle_count, double gridsize, double minimum_bin_size)
+grid::grid(double gridsize, double minimum_bin_size)
+    : _bins_per_dim(compute_bins_per_dimension(0, gridsize, minimum_bin_size)),
+      _particle_count(0),
+      _size(gridsize)
+{
+    _binsize = _size / _bins_per_dim;
+}
+
+grid::grid(size_t particle_count, double gridsize, double minimum_bin_size)
     : _bins_per_dim(compute_bins_per_dimension(particle_count, gridsize, minimum_bin_size)),
+      _particle_count(particle_count),
       _size(gridsize)
 {
     _binsize = _size / _bins_per_dim;
@@ -93,6 +105,11 @@ double grid::binsize() const
 double grid::size() const
 {
     return _size;
+}
+
+size_t grid::particle_count() const
+{
+    return _particle_count;
 }
 
 particle_bin &grid::operator[](size_t bin_id) {
