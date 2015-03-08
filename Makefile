@@ -32,7 +32,9 @@ all:	main-build
 main-build: pre-build $(TARGETS)
 debug: CFLAGS = $(DEBUG_CFLAGS)
 debug: main-build
-check: 	main-build $(TESTS)
+debug-tests: debug tests
+tests: pre-build $(TESTS)
+check: 	tests
 	./$(BINDIR)/test/gridtest
 pre-build:
 	mkdir -p build/test
@@ -41,7 +43,7 @@ pre-build:
 
 
 # Targets below
-$(SERIAL_TARGET): $(BUILDDIR)/grid.o $(BUILDDIR)/serial.o $(BUILDDIR)/common.o 
+$(SERIAL_TARGET): $(BUILDDIR)/grid.o $(BUILDDIR)/spatial_partition.o $(BUILDDIR)/serial.o $(BUILDDIR)/common.o 
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@  
 
 $(AUTOGRADER_TARGET): $(BUILDDIR)/autograder.o $(BUILDDIR)/common.o
@@ -57,7 +59,7 @@ $(MPI_TARGET): $(BUILDDIR)/grid.o $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o
 	$(MPCC) $(CFLAGS) $^ $(LIBS) $(MPILIBS) -o $@
 
 # Tests
-$(GRIDTEST): $(BUILDDIR)/common.o $(BUILDDIR)/grid.o $(BUILDDIR)/test/catch.o $(BUILDDIR)/test/gridtest.o
+$(GRIDTEST): $(BUILDDIR)/spatial_partition.o  $(BUILDDIR)/common.o $(BUILDDIR)/grid.o $(BUILDDIR)/test/catch.o $(BUILDDIR)/test/gridtest.o
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
 # Build all object files (note: here we assume we want to use the same compiler flags for all objects)
@@ -70,7 +72,10 @@ $(BUILDDIR)/common.o: $(SRC)/common.cpp include/common.h
 $(BUILDDIR)/grid.o: $(SRC)/grid.cpp include/grid.h	
 	$(CC) $(CFLAGS) -c $(SRC)/grid.cpp -o $@
 
-$(BUILDDIR)/pthread_barrier.o: $(SRC)/pthread_barrier.c include/pthread_barrier.h	
+$(BUILDDIR)/spatial_partition.o: $(SRC)/spatial_partition.cpp include/spatial_partition.h
+	$(CC) $(CFLAGS) -c $(SRC)/spatial_partition.cpp -o $@
+
+$(BUILDDIR)/pthread_barrier.o: $(SRC)/pthread_barrier.c include/pthread_barrier.h
 	$(CC) $(CFLAGS) -c $(SRC)/pthread_barrier.c -o $@
 
 $(BUILDDIR)/mpi.o: $(SRC)/mpi.cpp
