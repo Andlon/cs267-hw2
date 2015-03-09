@@ -86,10 +86,10 @@ $(BUILDDIR)/mpi.o: $(SRC)/mpi.cpp
 	$(MPCC) $(CFLAGS) -c $? $(LIBS) $(MPILIBS) -o $@
 
 $(BUILDDIR)/spatial_partition_omp.o: $(BUILDDIR)/spatial_partition.o $(SRC)/spatial_partition_omp.cpp include/spatial_partition_omp.h
-	$(CC) $(CFLAGS) -c $(SRC)/spatial_partition_omp.cpp -o $@
+	$(CC) $(OPENMP) $(CFLAGS) -c $(SRC)/spatial_partition_omp.cpp -o $@
 
 $(BUILDDIR)/openmp.o: $(BUILDDIR)/spatial_partition_omp.o $(SRC)/openmp.cpp 
-	$(CC) $(CFLAGS) -c $(SRC)/openmp.cpp -o $@
+	$(CC) $(OPENMP) $(CFLAGS) -c $(SRC)/openmp.cpp -o $@
 
 $(BUILDDIR)/%.o: $(SRC)/%.cpp
 	$(CC) $(CFLAGS) -c $? -o $@

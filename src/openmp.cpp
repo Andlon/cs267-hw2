@@ -34,7 +34,6 @@ int main( int argc, char **argv )
     FILE *fsave = savename ? fopen( savename, "w" ) : NULL;
     FILE *fsum = sumname ? fopen ( sumname, "a" ) : NULL;
 
-
     set_size( n );
     grid particle_grid(n, get_size(), get_cutoff());
     partitioned_storage storage(particle_grid);
@@ -52,25 +51,12 @@ int main( int argc, char **argv )
             davg = 0.0;
             dmin = 1.0;
 
+            // Have not yet made partition parallel
+            #pragma omp single
             partition(storage, particle_grid);
+
             update_forces_omp(storage, particle_grid, &dmin, &davg, &navg);
-            move_particles(storage);
-
-//            #pragma omp for reduction (+:navg) reduction(+:davg)
-//            for( int i = 0; i < n; i++ )
-//            {
-//                particles[i].ax = particles[i].ay = 0;
-//                for (int j = 0; j < n; j++ )
-//                    apply_force( particles[i], particles[j],&dmin,&davg,&navg);
-//            }
-
-
-//            //
-//            //  move particles
-//            //
-//            #pragma omp for
-//            for( int i = 0; i < n; i++ )
-//                move( particles[i] );
+            move_particles_omp(storage);
 
             if( find_option( argc, argv, "-no" ) == -1 )
             {
