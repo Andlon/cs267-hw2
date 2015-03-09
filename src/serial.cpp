@@ -33,18 +33,12 @@ int main( int argc, char **argv )
     FILE *fsave = savename ? fopen( savename, "w" ) : NULL;
     FILE *fsum = sumname ? fopen ( sumname, "a" ) : NULL;
 
-    //particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
     set_size( n );
     grid particle_grid(n, get_size(), get_cutoff());
     partitioned_storage storage(particle_grid);
     init_particles( n, &storage.particles[0] );
-
-    //grid particle_grid(n, get_size(), get_cutoff());
-
     
-    //
     //  simulate a number of time steps
-    //
     double simulation_time = read_timer( );
 
     for( int step = 0; step < NSTEPS; step++ )
@@ -54,28 +48,21 @@ int main( int argc, char **argv )
         davg = 0.0;
         dmin = 1.0;
 
-        // Partition particles and compute forces
+        // Update
         partition(storage, particle_grid);
         update_forces(storage, particle_grid, &dmin, &davg, &navg);
-
-        //  move particles
-        for (auto & particle : storage.particles)
-            move(particle);
+        move_particles(storage);
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
-            //
             // Computing statistical data
-            //
             if (navg) {
                 absavg +=  davg/navg;
                 nabsavg++;
             }
             if (dmin < absmin) absmin = dmin;
 
-            //
             //  save if necessary
-            //
             if( fsave && (step%SAVEFREQ) == 0 )
                 save( fsave, n, &storage.particles[0] );
         }

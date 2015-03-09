@@ -130,3 +130,10 @@ void compute_particle_forces_in_partition(partitioned_storage &storage, particle
         }
     }
 }
+
+
+void move_particles(partitioned_storage &storage)
+{
+    for (auto & particle : storage.particles)
+        move(particle);
+}
