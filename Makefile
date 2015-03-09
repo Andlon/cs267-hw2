@@ -75,6 +75,9 @@ $(BUILDDIR)/grid.o: $(SRC)/grid.cpp include/grid.h
 $(BUILDDIR)/spatial_partition.o: $(SRC)/spatial_partition.cpp include/spatial_partition.h
 	$(CC) $(CFLAGS) -c $(SRC)/spatial_partition.cpp -o $@
 
+$(BUILDDIR)/serial.o: $(BUILDDIR)/common.o include/common.h $(SRC)/serial.cpp include/grid.h	
+	$(CC) $(CFLAGS) -c $(SRC)/serial.cpp -o $@
+
 $(BUILDDIR)/pthread_barrier.o: $(SRC)/pthread_barrier.c include/pthread_barrier.h
 	$(CC) $(CFLAGS) -c $(SRC)/pthread_barrier.c -o $@
 

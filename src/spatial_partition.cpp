@@ -32,6 +32,9 @@ partitioned_storage::partitioned_storage(const grid &particle_grid)
 
 void partition(partitioned_storage &storage, const grid &grid)
 {
+    assert(storage.particles.size() > 0);
+    assert(storage.partitions.size() > 0);
+
     for (auto & particle : storage.particles)
         particle.partition = determine_bin_for_particle(grid, particle);
 
@@ -53,8 +56,10 @@ void partition(partitioned_storage &storage, const grid &grid)
         }
     }
 
-    // Last partition always spans the last part of the vector
-    storage.partitions.back() = storage.particles.size();
+    // The partition associated with the last particle
+    // spans the rest of the particle vector
+    for (size_t i = partition; i < storage.partitions.size(); ++i)
+        storage.partitions[i] = storage.particles.size();
 }
 
 void update_forces(partitioned_storage &storage, const grid &grid, double *dmin, double *davg, int *navg)
