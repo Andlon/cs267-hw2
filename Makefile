@@ -52,8 +52,9 @@ $(AUTOGRADER_TARGET): $(BUILDDIR)/autograder.o $(BUILDDIR)/common.o
 $(PTHREADS_TARGET): $(BUILDDIR)/pthreads.o $(BUILDDIR)/common.o
 	$(CC) -o $@ $(BUILDDIR)/pthreads.o $(BUILDDIR)/common.o $(LIBS) -lpthread 
 
-$(OPENMP_TARGET): $(BUILDDIR)/openmp.o $(BUILDDIR)/common.o
-	$(CC) -o $@ $(OPENMP) $(BUILDDIR)/openmp.o $(BUILDDIR)/common.o $(LIBS) 
+$(OPENMP_TARGET): $(BUILDDIR)/spatial_partition_omp.o $(BUILDDIR)/spatial_partition.o $(BUILDDIR)/grid.o $(BUILDDIR)/common.o $(BUILDDIR)/openmp.o 
+	$(CC) $(OPENMP) $(CFLAGS) $^ $(LIBS) -o $@  
+ 
 
 $(MPI_TARGET): $(BUILDDIR)/grid.o $(BUILDDIR)/mpi.o $(BUILDDIR)/common.o
 	$(MPCC) $(CFLAGS) $^ $(LIBS) $(MPILIBS) -o $@
@@ -69,10 +70,10 @@ $(GRIDTEST): $(BUILDDIR)/spatial_partition.o  $(BUILDDIR)/common.o $(BUILDDIR)/g
 $(BUILDDIR)/common.o: $(SRC)/common.cpp include/common.h	
 	$(CC) $(CFLAGS) -c $(SRC)/common.cpp -o $@
 
-$(BUILDDIR)/grid.o: $(SRC)/grid.cpp include/grid.h	
+$(BUILDDIR)/grid.o: $(SRC)/grid.cpp include/grid.h $(BUILDDIR)/common.o	
 	$(CC) $(CFLAGS) -c $(SRC)/grid.cpp -o $@
 
-$(BUILDDIR)/spatial_partition.o: $(SRC)/spatial_partition.cpp include/spatial_partition.h
+$(BUILDDIR)/spatial_partition.o: $(BUILDDIR)/grid.o $(SRC)/spatial_partition.cpp include/spatial_partition.h
 	$(CC) $(CFLAGS) -c $(SRC)/spatial_partition.cpp -o $@
 
 $(BUILDDIR)/serial.o: $(BUILDDIR)/common.o include/common.h $(SRC)/serial.cpp include/grid.h	
@@ -83,6 +84,12 @@ $(BUILDDIR)/pthread_barrier.o: $(SRC)/pthread_barrier.c include/pthread_barrier.
 
 $(BUILDDIR)/mpi.o: $(SRC)/mpi.cpp
 	$(MPCC) $(CFLAGS) -c $? $(LIBS) $(MPILIBS) -o $@
+
+$(BUILDDIR)/spatial_partition_omp.o: $(BUILDDIR)/spatial_partition.o $(SRC)/spatial_partition_omp.cpp include/spatial_partition_omp.h
+	$(CC) $(CFLAGS) -c $(SRC)/spatial_partition_omp.cpp -o $@
+
+$(BUILDDIR)/openmp.o: $(BUILDDIR)/spatial_partition_omp.o $(SRC)/openmp.cpp 
+	$(CC) $(CFLAGS) -c $(SRC)/openmp.cpp -o $@
 
 $(BUILDDIR)/%.o: $(SRC)/%.cpp
 	$(CC) $(CFLAGS) -c $? -o $@
