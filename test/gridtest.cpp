@@ -42,7 +42,7 @@ TEST_CASE("associated algorithms") {
 }
 
 TEST_CASE("spatial_partition") {
-    SECTION("partition") {
+    SECTION("uniform partition") {
         grid grid(1.0, 0.45);
         partitioned_storage storage(grid);
 
@@ -69,6 +69,28 @@ TEST_CASE("spatial_partition") {
 
         REQUIRE(storage.partitions[0] == 1);
         REQUIRE(storage.partitions[1] == 2);
+        REQUIRE(storage.partitions[2] == 3);
+        REQUIRE(storage.partitions[3] == 4);
+    }
+
+    SECTION("uneven partition") {
+        grid grid(1.0, 0.45);
+        partitioned_storage storage(grid);
+
+        std::vector<particle_t> particles = {
+            { 0.1, 0.1 },
+            { 0.2, 0.1 },
+            { 0.1, 0.0 },
+            { 0.8, 0.8 }
+        };
+
+        storage.particles = particles;
+        partition(storage, grid);
+
+        REQUIRE(storage.particles.size() == 4);
+
+        REQUIRE(storage.partitions[0] == 3);
+        REQUIRE(storage.partitions[1] == 3);
         REQUIRE(storage.partitions[2] == 3);
         REQUIRE(storage.partitions[3] == 4);
     }

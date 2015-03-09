@@ -33,7 +33,14 @@ struct partitioned_storage {
 void partition(partitioned_storage & storage, const grid & grid);
 
 // Updates forces for particles in the storage. Assumes particles are correctly partitioned.
-void update_forces(partitioned_storage & storage);
+void update_forces(partitioned_storage & storage, const grid & grid, double *dmin, double *davg, int *navg);
+
+void compute_particle_forces(partitioned_storage &storage, const grid & grid, particle_t &particle,
+                             double *dmin, double *davg, int *navg);
+
+void compute_particle_forces_in_partition(partitioned_storage & storage, particle_t & particle, size_t partition_index,
+                                          double *dmin, double *davg, int *navg);
+
 
 void move_particles(partitioned_storage & storage);
 

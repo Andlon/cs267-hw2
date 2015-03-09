@@ -24,6 +24,7 @@ typedef struct
   double vy;
   double ax;
   double ay;
+  size_t partition;
 } particle_t;
 
 //

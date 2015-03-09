@@ -6,19 +6,19 @@
 
 namespace {
 
-const int MINIMUM_PARTICLES_PER_BIN = 2;
+const int MINIMUM_PARTICLES_PER_BIN = 1;
 
 int compute_bins_per_dimension(int particle_count, double size, double minimum_bin_size) {
     assert(size > 0);
     assert(minimum_bin_size > 0);
 
-    if (particle_count > 0) {
-        double density = particle_count / (size * size);
-        int expected_bin_particle_count = density * (minimum_bin_size * minimum_bin_size);
-        int desired_bin_particle_count = std::max(expected_bin_particle_count, MINIMUM_PARTICLES_PER_BIN);
+//    if (particle_count > 0) {
+//        double density = particle_count / (size * size);
+//        int expected_bin_particle_count = density * (minimum_bin_size * minimum_bin_size);
+//        int desired_bin_particle_count = std::max(expected_bin_particle_count, MINIMUM_PARTICLES_PER_BIN);
 
-        minimum_bin_size = sqrt(desired_bin_particle_count / density);
-    }
+//        minimum_bin_size = sqrt(desired_bin_particle_count / density);
+//    }
 
     minimum_bin_size = std::min(size, minimum_bin_size);
 

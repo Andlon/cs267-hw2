@@ -4,6 +4,7 @@
 #include <math.h>
 #include <common.h>
 #include <grid.h>
+#include <spatial_partition.h>
 
 //
 //  benchmarking program
@@ -32,11 +33,14 @@ int main( int argc, char **argv )
     FILE *fsave = savename ? fopen( savename, "w" ) : NULL;
     FILE *fsum = sumname ? fopen ( sumname, "a" ) : NULL;
 
-    particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
+    //particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
     set_size( n );
-    init_particles( n, particles );
-
     grid particle_grid(n, get_size(), get_cutoff());
+    partitioned_storage storage(particle_grid);
+    init_particles( n, storage.particles.data() );
+
+    //grid particle_grid(n, get_size(), get_cutoff());
+
     
     //
     //  simulate a number of time steps
@@ -50,14 +54,13 @@ int main( int argc, char **argv )
         davg = 0.0;
         dmin = 1.0;
 
-        // Distribute and compute forces
-        particle_grid.clear_particles();
-        particle_grid.distribute_particles(particles, n);
-        compute_forces_for_grid(particle_grid, &dmin, &davg, &navg);
+        // Partition particles and compute forces
+        partition(storage, particle_grid);
+        update_forces(storage, particle_grid, &dmin, &davg, &navg);
 
         //  move particles
-        for( int i = 0; i < n; i++ )
-            move( particles[i] );
+        for (auto & particle : storage.particles)
+            move(particle);
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
@@ -74,7 +77,7 @@ int main( int argc, char **argv )
             //  save if necessary
             //
             if( fsave && (step%SAVEFREQ) == 0 )
-                save( fsave, n, particles );
+                save( fsave, n, storage.particles.data() );
         }
     }
     simulation_time = read_timer( ) - simulation_time;
@@ -108,7 +111,6 @@ int main( int argc, char **argv )
     //
     if( fsum )
         fclose( fsum );
-    free( particles );
     if( fsave )
         fclose( fsave );
     
