@@ -29,9 +29,10 @@ TESTS = $(GRIDTEST)
 
 # Define build targets
 all:	main-build
+main-build: CFLAGS = $(RELEASE_CFLAGS)
 main-build: pre-build $(TARGETS)
+debug: pre-build $(TARGETS)
 debug: CFLAGS = $(DEBUG_CFLAGS)
-debug: main-build
 debug-tests: debug tests
 tests: pre-build $(TESTS)
 check: 	tests

@@ -42,18 +42,22 @@ int main( int argc, char **argv )
     //  simulate a number of time steps
     double simulation_time = read_timer( );
 
-    #pragma omp parallel private(dmin)
+    for( int step = 0; step < 1000; step++ )
     {
-        numthreads = omp_get_num_threads();
-        for( int step = 0; step < 1000; step++ )
-        {
-            navg = 0;
-            davg = 0.0;
-            dmin = 1.0;
+        // Note that parallel_partition must be called outside
+        // the parallel region because it is not thread-safe.
+        // Rather, it spawns internal threads indirectly through GCC's
+        // parallel algorithm (don't think it's possible to reuse threadpool
+        // from parallel region).
+        parallel_partition(storage, particle_grid);
 
-            // Have not yet made partition parallel. Run by single thread
-            #pragma omp single
-            partition(storage, particle_grid);
+        navg = 0;
+        davg = 0.0;
+
+        #pragma omp parallel private(dmin)
+        {
+            numthreads = omp_get_num_threads();
+            dmin = 1.0;
 
             update_forces_omp(storage, particle_grid, &dmin, &davg, &navg);
             move_particles_omp(storage);

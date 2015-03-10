@@ -3,6 +3,10 @@
 
 #include "spatial_partition.h"
 
+// Exactly the same as partition, but tries to force use of GCC's
+// parallel sort algorithm. NOT THREAD-SAFE! Spawns threads locally.
+void parallel_partition(partitioned_storage & storage, const grid & grid);
+
 // Updates forces for a subset of the particles in storage, specified by the vector of particles
 void update_forces_omp(std::vector<particle_t> & particles, partitioned_storage &storage,
                        const grid &grid, double *dmin, double *davg, int *navg);
