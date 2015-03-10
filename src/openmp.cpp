@@ -51,7 +51,7 @@ int main( int argc, char **argv )
             davg = 0.0;
             dmin = 1.0;
 
-            // Have not yet made partition parallel
+            // Have not yet made partition parallel. Run by single thread
             #pragma omp single
             partition(storage, particle_grid);
 
@@ -60,9 +60,7 @@ int main( int argc, char **argv )
 
             if( find_option( argc, argv, "-no" ) == -1 )
             {
-                //
                 //  compute statistical data
-                //
                 #pragma omp master
                 if (navg) {
                     absavg += davg/navg;
@@ -72,9 +70,7 @@ int main( int argc, char **argv )
                 #pragma omp critical
                 if (dmin < absmin) absmin = dmin;
 
-                //
                 //  save if necessary
-                //
                 #pragma omp master
                 if( fsave && (step%SAVEFREQ) == 0 )
                     save( fsave, n, &storage.particles[0] );
