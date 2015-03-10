@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <grid.h>
 #include "common.h"
+#include "spatial_partition_omp.h"
 
 //
 //  benchmarking program
@@ -13,8 +14,9 @@ int main( int argc, char **argv )
     int navg, nabsavg=0;
     double dmin, absmin=1.0,davg,absavg=0.0;
     double rdavg,rdmin;
-    int rnavg; 
- 
+    double local_absmin = absmin;
+    int rnavg;
+
     //
     //  process command line parameters
     //
@@ -47,16 +49,27 @@ int main( int argc, char **argv )
     FILE *fsave = savename && rank == 0 ? fopen( savename, "w" ) : NULL;
     FILE *fsum = sumname && rank == 0 ? fopen ( sumname, "a" ) : NULL;
 
-
-    particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
-    
+    // Create basic particle type
     MPI_Datatype PARTICLE;
-    MPI_Type_contiguous( 6, MPI_DOUBLE, &PARTICLE );
+    MPI_Type_contiguous(6, MPI_DOUBLE, &PARTICLE);
     MPI_Type_commit( &PARTICLE );
+
+    // Create extended particle type (includes partition info)
+    int block_lengths[] = { 0, 1, 1, 0 };
+    MPI_Aint displacements[] = { 0, 0, 6 * sizeof(double), sizeof(particle_t) };
+    MPI_Datatype types[] = { MPI_LB, PARTICLE, MPI_UINT64_T, MPI_UB };
+
+    MPI_Datatype PARTITIONED_PARTICLE;
+    MPI_Type_create_struct(2, block_lengths, displacements, types, &PARTITIONED_PARTICLE);
+    MPI_Type_commit(&PARTITIONED_PARTICLE);
+
+    set_size( n );
+
+    // Initialize particle grid
+    grid particle_grid(n, get_size(), get_cutoff());
+    partitioned_storage storage(particle_grid);
     
-    //
     //  set up the data partitioning across processors
-    //
     int particle_per_proc = (n + n_proc - 1) / n_proc;
     int *partition_offsets = (int*) malloc( (n_proc+1) * sizeof(int) );
     for( int i = 0; i < n_proc+1; i++ )
@@ -66,110 +79,95 @@ int main( int argc, char **argv )
     for( int i = 0; i < n_proc; i++ )
         partition_sizes[i] = partition_offsets[i+1] - partition_offsets[i];
     
-    //
     //  allocate storage for local partition
-    //
     int nlocal = partition_sizes[rank];
-    particle_t *local = (particle_t*) malloc( nlocal * sizeof(particle_t) );
+    std::vector<particle_t> local(nlocal);
     
-    //
     //  initialize and distribute the particles (that's fine to leave it unoptimized)
-    //
-    set_size( n );
     if( rank == 0 )
-        init_particles( n, particles );
-    MPI_Scatterv( particles, partition_sizes, partition_offsets, PARTICLE, local, nlocal, PARTICLE, 0, MPI_COMM_WORLD );
-
-    // Initialize particle grid
-    grid particle_grid(n, get_size(), get_cutoff());
+        init_particles( n, &storage.particles[0]);
+    MPI_Scatterv( &storage.particles[0], partition_sizes, partition_offsets, PARTITIONED_PARTICLE, &local[0], nlocal, PARTITIONED_PARTICLE, 0, MPI_COMM_WORLD );
     
     //
     //  simulate a number of time steps
     //
     double simulation_time = read_timer( );
+
+    #pragma omp parallel private(dmin)
     for( int step = 0; step < NSTEPS; step++ )
     {
         navg = 0;
         dmin = 1.0;
         davg = 0.0;
-        // 
+
+        #pragma omp single
+        partition(storage, particle_grid);
+
         //  collect all global data locally (not good idea to do)
-        //
-        MPI_Allgatherv( local, nlocal, PARTICLE, particles, partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
+        #pragma omp single
+        MPI_Allgatherv( &local[0], nlocal, PARTITIONED_PARTICLE, &storage.particles[0], partition_sizes, partition_offsets, PARTITIONED_PARTICLE, MPI_COMM_WORLD );
         
-        //
         //  save current step if necessary (slightly different semantics than in other codes)
-        //
+        #pragma omp single
         if( find_option( argc, argv, "-no" ) == -1 )
-          if( fsave && (step%SAVEFREQ) == 0 )
-            save( fsave, n, particles );
+            if( fsave && (step%SAVEFREQ) == 0 )
+                save( fsave, n, &storage.particles[0] );
 
-        // Distribute and compute forces
-        particle_grid.clear_particles();
-        particle_grid.distribute_particles(particles, n);
-        for( int i = 0; i < nlocal; i++ )
-        {
-            particle_t & particle = local[i];
-            compute_forces_for_particle(particle_grid,
-                                        determine_bin_for_particle(particle_grid, particle),
-                                        particle,
-                                        &dmin, &davg, &navg);
-        }
-     
+        update_forces_omp(local, storage, particle_grid, &dmin, &davg, &navg);
+        move_particles_omp(local);
+
         if( find_option( argc, argv, "-no" ) == -1 )
         {
-          
-          MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-          MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
-          MPI_Reduce(&dmin,&rdmin,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
+            #pragma omp critical
+            if (dmin < local_absmin) local_absmin = dmin;
 
- 
-          if (rank == 0){
-            //
-            // Computing statistical data
-            //
-            if (rnavg) {
-              absavg +=  rdavg/rnavg;
-              nabsavg++;
+            #pragma omp single
+            {
+                MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+                MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+                MPI_Reduce(&local_absmin,&rdmin,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
+
+                if (rank == 0){
+                    //
+                    // Computing statistical data
+                    //
+                    if (rnavg) {
+                        absavg +=  rdavg/rnavg;
+                        nabsavg++;
+                    }
+                    if (rdmin < absmin) absmin = rdmin;
+                }
             }
-            if (rdmin < absmin) absmin = rdmin;
-          }
         }
-
-        //
-        //  move particles
-        //
-        for( int i = 0; i < nlocal; i++ )
-            move( local[i] );
     }
     simulation_time = read_timer( ) - simulation_time;
-  
-    if (rank == 0) {  
-      printf( "n = %d, simulation time = %g seconds", n, simulation_time);
 
-      if( find_option( argc, argv, "-no" ) == -1 )
-      {
-        if (nabsavg) absavg /= nabsavg;
-      // 
-      //  -the minimum distance absmin between 2 particles during the run of the simulation
-      //  -A Correct simulation will have particles stay at greater than 0.4 (of cutoff) with typical values between .7-.8
-      //  -A simulation were particles don't interact correctly will be less than 0.4 (of cutoff) with typical values between .01-.05
-      //
-      //  -The average distance absavg is ~.95 when most particles are interacting correctly and ~.66 when no particles are interacting
-      //
-      printf( ", absmin = %lf, absavg = %lf", absmin, absavg);
-      if (absmin < 0.4) printf ("\nThe minimum distance is below 0.4 meaning that some particle is not interacting");
-      if (absavg < 0.8) printf ("\nThe average distance is below 0.8 meaning that most particles are not interacting");
-      }
-      printf("\n");     
+    if (rank == 0) {
+        printf( "n = %d, simulation time = %g seconds", n, simulation_time);
+
+        if( find_option( argc, argv, "-no" ) == -1 )
+        {
+            if (nabsavg) absavg /= nabsavg;
+            //
+            //  -the minimum distance absmin between 2 particles during the run of the simulation
+            //  -A Correct simulation will have particles stay at greater than 0.4 (of cutoff) with typical values between .7-.8
+            //  -A simulation were particles don't interact correctly will be less than 0.4 (of cutoff) with typical values between .01-.05
+            //
+            //  -The average distance absavg is ~.95 when most particles are interacting correctly and ~.66 when no particles are interacting
+            //
+            printf( ", absmin = %lf, absavg = %lf", absmin, absavg);
+            if (absmin < 0.4) printf ("\nThe minimum distance is below 0.4 meaning that some particle is not interacting");
+            if (absavg < 0.8) printf ("\nThe average distance is below 0.8 meaning that most particles are not interacting");
+        }
+        printf("\n");
         
-      //  
-      // Printing summary data
-      //  
-      if( fsum)
-        fprintf(fsum,"%d %d %g\n",n,n_proc,simulation_time);
+        //
+        // Printing summary data
+        //
+        if( fsum)
+            fprintf(fsum,"%d %d %g\n",n,n_proc,simulation_time);
     }
-  
+
     //
     //  release resources
     //
@@ -177,8 +175,6 @@ int main( int argc, char **argv )
         fclose( fsum );
     free( partition_offsets );
     free( partition_sizes );
-    free( local );
-    free( particles );
     if( fsave )
         fclose( fsave );
     
