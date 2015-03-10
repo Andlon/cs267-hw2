@@ -7,10 +7,11 @@ static const size_t FORCE_CHUNK_SIZE = 125;
 static const size_t MOVE_CHUNK_SIZE = 250;
 }
 
-void update_forces_omp(partitioned_storage &storage, const grid &grid, double *dmin, double *davg, int *navg)
+void update_forces_omp(std::vector<particle_t> & particles, partitioned_storage &storage,
+                       const grid &grid, double *dmin, double *davg, int *navg)
 {
     static const size_t chunk_size = FORCE_CHUNK_SIZE;
-    const size_t particle_count = storage.particles.size();
+    const size_t particle_count = particles.size();
 
     #pragma omp for
     for (size_t i = 0; i < particle_count; i += chunk_size)
@@ -20,7 +21,7 @@ void update_forces_omp(partitioned_storage &storage, const grid &grid, double *d
         int local_navg = 0;
 
         for (size_t j = i; j < std::min(particle_count, i + chunk_size); ++j)
-            compute_particle_forces(storage, grid, storage.particles[j], &local_dmin, &local_davg, &local_navg);
+            compute_particle_forces(storage, grid, particles[j], &local_dmin, &local_davg, &local_navg);
 
         #pragma omp critical (statistics_critical)
         {
@@ -32,9 +33,19 @@ void update_forces_omp(partitioned_storage &storage, const grid &grid, double *d
     }
 }
 
-void move_particles_omp(partitioned_storage &storage)
+void update_forces_omp(partitioned_storage &storage, const grid &grid, double *dmin, double *davg, int *navg)
+{
+    update_forces_omp(storage.particles, storage, grid, dmin, davg, navg);
+}
+
+void move_particles_omp(std::vector<particle_t> &particles)
 {
     #pragma omp for schedule(static, MOVE_CHUNK_SIZE)
-    for (size_t i = 0; i < storage.particles.size(); ++i)
-        move(storage.particles[i]);
+    for (size_t i = 0; i < particles.size(); ++i)
+        move(particles[i]);
+}
+
+void move_particles_omp(partitioned_storage &storage)
+{
+    move_particles_omp(storage.particles);
 }
