@@ -85,7 +85,7 @@ void init_particles( int n, particle_t *p )
 //
 //  interact two particles
 //
-void apply_force( particle_t &particle, particle_t &neighbor , double *dmin, double *davg, int *navg)
+void apply_force( particle_t &particle, const particle_t &neighbor , double *dmin, double *davg, int *navg)
 {
 
     double dx = neighbor.x - particle.x;
