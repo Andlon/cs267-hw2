@@ -51,17 +51,19 @@ int main( int argc, char **argv )
 
     // Create basic particle type
     MPI_Datatype PARTICLE;
-    MPI_Type_contiguous(6, MPI_DOUBLE, &PARTICLE);
+
+    // NOTE: THIS IS A MAJOR TEMPORARY HACK: treating size_t as double
+    MPI_Type_contiguous(7, MPI_DOUBLE, &PARTICLE);
     MPI_Type_commit( &PARTICLE );
 
     // Create extended particle type (includes partition info)
-    int block_lengths[] = { 0, 1, 1, 0 };
-    MPI_Aint displacements[] = { 0, 0, 6 * sizeof(double), sizeof(particle_t) };
-    MPI_Datatype types[] = { MPI_LB, PARTICLE, MPI_UINT64_T, MPI_UB };
+//    int block_lengths[] = { 0, 1, 1, 0 };
+//    MPI_Aint displacements[] = { 0, 0, 6 * sizeof(double), sizeof(particle_t) };
+//    MPI_Datatype types[] = { MPI_LB, PARTICLE, MPI_UINT64_T, MPI_UB };
 
-    MPI_Datatype PARTITIONED_PARTICLE;
-    MPI_Type_create_struct(2, block_lengths, displacements, types, &PARTITIONED_PARTICLE);
-    MPI_Type_commit(&PARTITIONED_PARTICLE);
+//    MPI_Datatype PARTITIONED_PARTICLE;
+//    MPI_Type_create_struct(2, block_lengths, displacements, types, &PARTITIONED_PARTICLE);
+//    MPI_Type_commit(&PARTITIONED_PARTICLE);
 
     set_size( n );
 
@@ -82,61 +84,63 @@ int main( int argc, char **argv )
     //  allocate storage for local partition
     int nlocal = partition_sizes[rank];
     std::vector<particle_t> local(nlocal);
+
+    printf("Number of local particles: %d\n", nlocal);
     
     //  initialize and distribute the particles (that's fine to leave it unoptimized)
     if( rank == 0 )
         init_particles( n, &storage.particles[0]);
-    MPI_Scatterv( &storage.particles[0], partition_sizes, partition_offsets, PARTITIONED_PARTICLE, &local[0], nlocal, PARTITIONED_PARTICLE, 0, MPI_COMM_WORLD );
+    MPI_Scatterv( &storage.particles[0], partition_sizes, partition_offsets, PARTICLE, &local[0], nlocal, PARTICLE, 0, MPI_COMM_WORLD );
     
-    //
     //  simulate a number of time steps
-    //
     double simulation_time = read_timer( );
-
-    #pragma omp parallel private(dmin)
     for( int step = 0; step < NSTEPS; step++ )
     {
         navg = 0;
         dmin = 1.0;
         davg = 0.0;
 
-        #pragma omp single
-        partition(storage, particle_grid);
-
         //  collect all global data locally (not good idea to do)
-        #pragma omp single
-        MPI_Allgatherv( &local[0], nlocal, PARTITIONED_PARTICLE, &storage.particles[0], partition_sizes, partition_offsets, PARTITIONED_PARTICLE, MPI_COMM_WORLD );
+        MPI_Allgatherv( &local[0], nlocal, PARTICLE, &storage.particles[0], partition_sizes, partition_offsets, PARTICLE, MPI_COMM_WORLD );
         
         //  save current step if necessary (slightly different semantics than in other codes)
-        #pragma omp single
         if( find_option( argc, argv, "-no" ) == -1 )
             if( fsave && (step%SAVEFREQ) == 0 )
                 save( fsave, n, &storage.particles[0] );
 
-        update_forces_omp(local, storage, particle_grid, &dmin, &davg, &navg);
-        move_particles_omp(local);
+//        parallel_partition(storage, particle_grid);
+//        #pragma omp parallel private(dmin)
+//        {
+//            update_forces_omp(local, storage, particle_grid, &dmin, &davg, &navg);
+//            move_particles_omp(local);
+
+//            #pragma omp critical
+//            if (dmin < local_absmin)
+//                local_absmin = dmin;
+//        }
+
+        // Single-threaded for now for the sake of correctness
+        update_partitions(local, particle_grid);
+        partition(storage, particle_grid);
+        update_forces(local, storage, particle_grid, &dmin, &davg, &navg);
+        move_particles(local);
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
-            #pragma omp critical
-            if (dmin < local_absmin) local_absmin = dmin;
+            MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
+            MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
+            MPI_Reduce(&dmin,&rdmin,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
 
-            #pragma omp single
+            if (rank == 0)
             {
-                MPI_Reduce(&davg,&rdavg,1,MPI_DOUBLE,MPI_SUM,0,MPI_COMM_WORLD);
-                MPI_Reduce(&navg,&rnavg,1,MPI_INT,MPI_SUM,0,MPI_COMM_WORLD);
-                MPI_Reduce(&local_absmin,&rdmin,1,MPI_DOUBLE,MPI_MIN,0,MPI_COMM_WORLD);
-
-                if (rank == 0){
-                    //
-                    // Computing statistical data
-                    //
-                    if (rnavg) {
-                        absavg +=  rdavg/rnavg;
-                        nabsavg++;
-                    }
-                    if (rdmin < absmin) absmin = rdmin;
+                // Computing statistical data
+                if (rnavg)
+                {
+                    absavg +=  rdavg/rnavg;
+                    nabsavg++;
                 }
+                if (rdmin < absmin)
+                    absmin = rdmin;
             }
         }
     }
