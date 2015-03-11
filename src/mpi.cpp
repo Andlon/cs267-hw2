@@ -1,4 +1,3 @@
-#include <mpi.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <assert.h>
@@ -6,6 +5,7 @@
 #include <omp.h>
 #include "common.h"
 #include "spatial_partition_omp.h"
+#include <mpi.h>
 
 //
 //  benchmarking program
