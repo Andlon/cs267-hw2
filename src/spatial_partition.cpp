@@ -21,6 +21,13 @@ static const location NEIGHBORHOOD[] = {
     {  1,  1 }
 };
 
+// Consider a particle to be equal if it occupies exactly the same location
+bool particles_equal(const particle_t & a, const particle_t & b) {
+    return  a.partition == b.partition &&
+            a.x == b.x &&
+            a.y == b.y;
+}
+
 }
 
 partitioned_storage::partitioned_storage(const grid &particle_grid)
@@ -35,8 +42,7 @@ void partition(partitioned_storage &storage, const grid &grid)
     assert(storage.particles.size() > 0);
     assert(storage.partitions.size() > 0);
 
-    for (auto & particle : storage.particles)
-        particle.partition = determine_bin_for_particle(grid, particle);
+    update_partitions(storage.particles, grid);
 
     // Sort all the particles by their partition indices
     std::sort(storage.particles.begin(), storage.particles.end(),
@@ -62,14 +68,18 @@ void partition(partitioned_storage &storage, const grid &grid)
         storage.partitions[i] = storage.particles.size();
 }
 
-void update_forces(partitioned_storage &storage, const grid &grid, double *dmin, double *davg, int *navg)
+void update_forces(std::vector<particle_t> &particles, partitioned_storage &storage, const grid &grid, double *dmin, double *davg, int *navg)
 {
-    for (auto & particle : storage.particles)
+    for (auto & particle : particles)
     {
         compute_particle_forces(storage, grid, particle, dmin, davg, navg);
     }
 }
 
+void update_forces(partitioned_storage &storage, const grid &grid, double *dmin, double *davg, int *navg)
+{
+    update_forces(storage.particles, storage, grid, dmin, davg, navg);
+}
 
 void compute_particle_forces(partitioned_storage &storage, const grid &grid, particle_t & particle, double *dmin, double *davg, int *navg)
 {
@@ -123,9 +133,8 @@ void compute_particle_forces_in_partition(partitioned_storage &storage, particle
 
     // Iterate over particles in partition [start, end)
     for (size_t i = start; i < end; ++i) {
-        particle_t & neighbor = storage.particles[i];
-        // Avoid self-interaction
-        if (&particle != &neighbor) {
+        const particle_t & neighbor = storage.particles[i];
+        if (!particles_equal(particle, neighbor)) {
             apply_force(particle, neighbor, dmin, davg, navg);
         }
     }
@@ -134,6 +143,19 @@ void compute_particle_forces_in_partition(partitioned_storage &storage, particle
 
 void move_particles(partitioned_storage &storage)
 {
-    for (auto & particle : storage.particles)
+    move_particles(storage.particles);
+}
+
+
+void move_particles(std::vector<particle_t> &particles)
+{
+    for (auto & particle : particles)
         move(particle);
+}
+
+
+void update_partitions(std::vector<particle_t> &particles, const grid &grid)
+{
+    for (auto & particle : particles)
+        particle.partition = determine_bin_for_particle(grid, particle);
 }

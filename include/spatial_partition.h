@@ -28,11 +28,19 @@ struct partitioned_storage {
     std::vector<size_t> partitions;
 };
 
+// Updates the partition property of each particle to match its location
+void update_partitions(std::vector<particle_t> & particles, const grid & grid);
+
 // (Re-)partitions the particles in the storage according to their locations
 // and properties of the grid.
 void partition(partitioned_storage & storage, const grid & grid);
 
-// Updates forces for particles in the storage. Assumes particles are correctly partitioned.
+// Updates forces for a subset of the particles in storage, specified by the vector of particles.
+// Assumes particles are correctly partitioned.
+void update_forces(std::vector<particle_t> & particles, partitioned_storage &storage,
+                       const grid &grid, double *dmin, double *davg, int *navg);
+
+// Updates forces for all particles in the storage. Assumes particles are correctly partitioned.
 void update_forces(partitioned_storage & storage, const grid & grid, double *dmin, double *davg, int *navg);
 
 void compute_particle_forces(partitioned_storage &storage, const grid & grid, particle_t &particle,
@@ -42,6 +50,7 @@ void compute_particle_forces_in_partition(partitioned_storage & storage, particl
                                           double *dmin, double *davg, int *navg);
 
 
+void move_particles(std::vector<particle_t> & particles);
 void move_particles(partitioned_storage & storage);
 
 #endif // __CS267_SPATIAL_PARTITION_H
