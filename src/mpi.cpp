@@ -50,14 +50,37 @@ int main( int argc, char **argv )
     FILE *fsave = savename && rank == 0 ? fopen( savename, "w" ) : NULL;
     FILE *fsum = sumname && rank == 0 ? fopen ( sumname, "a" ) : NULL;
 
-    // Create basic particle type. Note that we only send the first 4 doubles,
-    // corresponding to position and velocity, as force and partition are
-    // updated locally anyway.
+    // Create basic particle type
+    static particle_t prototype;
+
+    MPI_Aint prototype_address, x_address, y_address, vx_address, vy_address,
+            ax_address, ay_address, partition_address;
+    MPI_Aint x_offset, y_offset, vx_offset, vy_offset, ax_offset, ay_offset, partition_offset;
+
+    MPI_Get_address(&prototype, &prototype_address);
+    MPI_Get_address(&prototype.x, &x_address);
+    MPI_Get_address(&prototype.y, &y_address);
+    MPI_Get_address(&prototype.vx, &vx_address);
+    MPI_Get_address(&prototype.vy, &vy_address);
+    MPI_Get_address(&prototype.ax, &ax_address);
+    MPI_Get_address(&prototype.ay, &ay_address);
+    MPI_Get_address(&prototype.partition, &partition_address);
+
+    x_offset = x_address - prototype_address;
+    y_offset = y_address - prototype_address;
+    vx_offset = vx_address - prototype_address;
+    vy_offset = vy_address - prototype_address;
+    ax_offset = ax_address - prototype_address;
+    ay_offset = ay_address - prototype_address;
+    partition_offset = partition_address - prototype_address;
+
     MPI_Datatype PARTICLE;
-    int block_sizes[] = { 4, 0 };
-    MPI_Aint displacements[] = { 0, sizeof(particle_t) };
-    MPI_Datatype types[] = { MPI_DOUBLE, MPI_UB };
-    MPI_Type_create_struct(2, block_sizes, displacements, types, &PARTICLE);
+    int block_sizes[] = { 1, 1, 1, 1, 1, 1, 1 };
+    MPI_Aint displacements[] = { x_offset, y_offset, vx_offset, vy_offset,
+                                 ax_offset, ay_offset, partition_offset };
+    MPI_Datatype types[] = { MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE, MPI_DOUBLE,
+                             MPI_DOUBLE, MPI_DOUBLE, MPI_UNSIGNED };
+    MPI_Type_create_struct(7, block_sizes, displacements, types, &PARTICLE);
     MPI_Type_commit( &PARTICLE );
 
     // Set global size of domain
