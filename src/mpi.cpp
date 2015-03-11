@@ -104,12 +104,17 @@ int main( int argc, char **argv )
 
         // Update particles
         update_partitions(local, particle_grid);
-        parallel_partition(storage, particle_grid);
-        #pragma omp parallel
-        {
-            update_forces_omp(local, storage, particle_grid, &dmin, &davg, &navg);
-            move_particles_omp(local);
-        }
+//        parallel_partition(storage, particle_grid);
+//        #pragma omp parallel
+//        {
+//            update_forces_omp(local, storage, particle_grid, &dmin, &davg, &navg);
+//            move_particles_omp(local);
+//        }
+
+        // Temporarily use single thread
+        partion(storage, particle_grid);
+        update_forces(local, storage, particle_grid, &dmin, &davg, &navg);
+        move_particles(local);
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
