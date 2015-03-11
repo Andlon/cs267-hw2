@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <assert.h>
 #include <grid.h>
+#include <omp.h>
 #include "common.h"
 #include "spatial_partition_omp.h"
 
@@ -49,22 +50,17 @@ int main( int argc, char **argv )
     FILE *fsave = savename && rank == 0 ? fopen( savename, "w" ) : NULL;
     FILE *fsum = sumname && rank == 0 ? fopen ( sumname, "a" ) : NULL;
 
-    // Create basic particle type
+    // Create basic particle type. Note that we only send the first 4 doubles,
+    // corresponding to position and velocity, as force and partition are
+    // updated locally anyway.
     MPI_Datatype PARTICLE;
-
-    // NOTE: THIS IS A MAJOR TEMPORARY HACK: treating size_t as double
-    MPI_Type_contiguous(7, MPI_DOUBLE, &PARTICLE);
+    int block_sizes[] = { 4, 0 };
+    MPI_Aint displacements[] = { 0, sizeof(particle_t) };
+    MPI_Datatype types[] = { MPI_DOUBLE, MPI_UB };
+    MPI_Type_create_struct(2, block_sizes, displacements, types, &PARTICLE);
     MPI_Type_commit( &PARTICLE );
 
-    // Create extended particle type (includes partition info)
-//    int block_lengths[] = { 0, 1, 1, 0 };
-//    MPI_Aint displacements[] = { 0, 0, 6 * sizeof(double), sizeof(particle_t) };
-//    MPI_Datatype types[] = { MPI_LB, PARTICLE, MPI_UINT64_T, MPI_UB };
-
-//    MPI_Datatype PARTITIONED_PARTICLE;
-//    MPI_Type_create_struct(2, block_lengths, displacements, types, &PARTITIONED_PARTICLE);
-//    MPI_Type_commit(&PARTITIONED_PARTICLE);
-
+    // Set global size of domain
     set_size( n );
 
     // Initialize particle grid
@@ -108,22 +104,14 @@ int main( int argc, char **argv )
             if( fsave && (step%SAVEFREQ) == 0 )
                 save( fsave, n, &storage.particles[0] );
 
-//        parallel_partition(storage, particle_grid);
-//        #pragma omp parallel private(dmin)
-//        {
-//            update_forces_omp(local, storage, particle_grid, &dmin, &davg, &navg);
-//            move_particles_omp(local);
-
-//            #pragma omp critical
-//            if (dmin < local_absmin)
-//                local_absmin = dmin;
-//        }
-
-        // Single-threaded for now for the sake of correctness
+        // Update particles
         update_partitions(local, particle_grid);
-        partition(storage, particle_grid);
-        update_forces(local, storage, particle_grid, &dmin, &davg, &navg);
-        move_particles(local);
+        parallel_partition(storage, particle_grid);
+        #pragma omp parallel
+        {
+            update_forces_omp(local, storage, particle_grid, &dmin, &davg, &navg);
+            move_particles_omp(local);
+        }
 
         if( find_option( argc, argv, "-no" ) == -1 )
         {
