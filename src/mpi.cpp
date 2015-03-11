@@ -80,8 +80,6 @@ int main( int argc, char **argv )
     //  allocate storage for local partition
     int nlocal = partition_sizes[rank];
     std::vector<particle_t> local(nlocal);
-
-    printf("Number of local particles: %d\n", nlocal);
     
     //  initialize and distribute the particles (that's fine to leave it unoptimized)
     if( rank == 0 )
