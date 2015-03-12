@@ -1,4 +1,4 @@
-all: loglogOn.png speedup.png speedup-16000.png
+all: loglogOn.png speedup.png speedup-16000.png gpu.png
 
 %.png: %.gnu ../data/*
 	gnuplot $< 

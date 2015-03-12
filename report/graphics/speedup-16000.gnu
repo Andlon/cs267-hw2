@@ -7,4 +7,4 @@ set ylabel "Speedup"
 
 plot "../data/openmp24-16000.txt"  using 1:2 title 'speedup for openMP' with lines, \
      "../data/pthreads24-16000.txt"  using 1:2 title 'speedup for pthreads' with lines, \
-     "../data/mpi24i-16000.txt"  using 1:2 title 'speedup for MPI' with lines
+     "../data/mpi24-16000.txt"  using 1:2 title 'speedup for MPI' with lines
