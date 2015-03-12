@@ -1,0 +1,36 @@
+Warning: no access to tty (Bad file descriptor).
+Thus no job control in this shell.
+n = 500, simulation time = 1.04063 seconds
+Application 10692852 resources: utime ~1s, stime ~0s, Rss ~10992, inblocks ~35, outblocks ~53
+n = 1000, simulation time = 4.11563 seconds
+Application 10692858 resources: utime ~4s, stime ~0s, Rss ~10992, inblocks ~35, outblocks ~53
+n = 2000, simulation time = 16.4387 seconds
+Application 10692864 resources: utime ~16s, stime ~0s, Rss ~10992, inblocks ~35, outblocks ~53
+n = 4000, simulation time = 65.3488 seconds
+Application 10692881 resources: utime ~65s, stime ~0s, Rss ~10992, inblocks ~35, outblocks ~53
+n = 8000, simulation time = 261.268 seconds
+Application 10692977 resources: utime ~261s, stime ~0s, Rss ~10992, inblocks ~35, outblocks ~53
+
+Serial code is O(N^slope)
+Slope estimates are : 1.983656 1.997911 1.991065 1.999298
+Slope estimate for line fit is: 1.993283
+
+
+
+ + --------------------------------------------------------------------------
+ +        Job name: auto-hopper-serial
+ +          Job Id: 2522684.edique02
+ +          System: edison
+ +     Queued Time: Wed Mar 11 17:00:01 2015
+ +      Start Time: Wed Mar 11 17:00:18 2015
+ + Completion Time: Wed Mar 11 17:06:29 2015
+ +            User: suhang
+ +        MOM Host: nid02816
+ +           Queue: debug
+ +  Req. Resources: mppdepth=1,mppnodect=1,mppnppn=1,mppwidth=1,walltime=00:20:00
+ +  Used Resources: cput=00:00:00,energy_used=0,mem=6460kb,vmem=135520kb,walltime=00:06:12
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/u1/s/suhang/projects/cs267/cs267-hw2/src/bin
+ +     Submit Args: -f auto-hopper-serial
+ + --------------------------------------------------------------------------
+

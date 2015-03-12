@@ -1,0 +1,60 @@
+n = 500, simulation time = 0.135287 seconds
+Application 46571984 resources: utime ~0s, stime ~0s, Rss ~3764, inblocks ~5669, outblocks ~14916
+n = 500,threads = 1, simulation time = 0.132519 seconds
+Application 46571985 resources: utime ~0s, stime ~0s, Rss ~3764, inblocks ~5919, outblocks ~15897
+n = 500,threads = 2, simulation time = 0.116201 seconds
+Application 46571988 resources: utime ~0s, stime ~0s, Rss ~3764, inblocks ~5919, outblocks ~15897
+n = 500,threads = 4, simulation time = 0.074307 seconds
+Application 46571989 resources: utime ~0s, stime ~0s, Rss ~3764, inblocks ~5919, outblocks ~15897
+n = 500,threads = 6, simulation time = 0.062915 seconds
+Application 46571995 resources: utime ~1s, stime ~0s, Rss ~3764, inblocks ~5919, outblocks ~15897
+n = 500,threads = 12, simulation time = 0.061075 seconds
+Application 46571997 resources: utime ~1s, stime ~0s, Rss ~3764, inblocks ~5919, outblocks ~15897
+n = 500,threads = 18, simulation time = 0.067007 seconds
+Application 46571998 resources: utime ~1s, stime ~0s, Rss ~3764, inblocks ~5919, outblocks ~15897
+n = 500,threads = 24, simulation time = 0.072119 seconds
+Application 46572007 resources: utime ~2s, stime ~0s, Rss ~3764, inblocks ~5919, outblocks ~15897
+n = 1000,threads = 2, simulation time = 0.242727 seconds
+Application 46572009 resources: utime ~1s, stime ~0s, Rss ~5268, inblocks ~5919, outblocks ~15897
+n = 2000,threads = 4, simulation time = 0.306725 seconds
+Application 46572010 resources: utime ~1s, stime ~0s, Rss ~9452, inblocks ~5919, outblocks ~15897
+n = 3000,threads = 6, simulation time = 0.353438 seconds
+Application 46572011 resources: utime ~2s, stime ~0s, Rss ~13748, inblocks ~5919, outblocks ~15897
+n = 6000,threads = 12, simulation time = 0.547308 seconds
+Application 46572013 resources: utime ~7s, stime ~0s, Rss ~26444, inblocks ~5919, outblocks ~15897
+n = 9000,threads = 18, simulation time = 0.738775 seconds
+Application 46572015 resources: utime ~14s, stime ~0s, Rss ~39088, inblocks ~5919, outblocks ~15897
+n = 12000,threads = 24, simulation time = 0.976305 seconds
+Application 46572016 resources: utime ~24s, stime ~0s, Rss ~51372, inblocks ~5919, outblocks ~15897
+
+Strong scaling estimates are :
+    1.02    1.16    1.82    2.15    2.22    2.02    1.88 (speedup)
+    1.02    0.58    0.46    0.36    0.18    0.11    0.08 (efficiency)    for
+       1       2       4       6      12      18      24 threads/processors
+
+Average strong scaling efficiency:    0.40 
+
+Weak scaling estimates are :
+    1.02    0.56    0.44    0.38    0.25    0.18    0.14 (efficiency)    for
+       1       2       4       6      12      18      24 threads/processors
+
+Average weak scaling efficiency:    0.42 
+
+
+ + --------------------------------------------------------------------------
+ +        Job name: auto-hopper-openmp24
+ +          Job Id: 8817997.hopque01
+ +          System: hopper
+ +     Queued Time: Mon Mar  2 08:38:38 2015
+ +      Start Time: Mon Mar  2 08:40:06 2015
+ + Completion Time: Mon Mar  2 08:40:26 2015
+ +            User: suhang
+ +        MOM Host: nid04749
+ +           Queue: debug
+ +  Req. Resources: mppdepth=24,mppnodect=1,mppnppn=1,mppwidth=1,walltime=00:20:00
+ +  Used Resources: cput=00:00:00,energy_used=0,mem=0kb,vmem=0kb,walltime=00:00:22
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/u1/s/suhang/projects/cs267/cs267-hw2/src/bin
+ +     Submit Args: -f auto-hopper-openmp24
+ + --------------------------------------------------------------------------
+

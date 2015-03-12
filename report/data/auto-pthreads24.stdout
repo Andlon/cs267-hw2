@@ -1,0 +1,62 @@
+Warning: no access to tty (Bad file descriptor).
+Thus no job control in this shell.
+n = 500, simulation time = 0.13476 seconds
+Application 46572071 resources: utime ~0s, stime ~0s, Rss ~3764, inblocks ~5669, outblocks ~14916
+n = 500, n_threads=1, simulation time = 0.149181 seconds
+Application 46572073 resources: utime ~0s, stime ~0s, Rss ~3764, inblocks ~5678, outblocks ~14955
+n = 500, n_threads=2, simulation time = 0.142627 seconds
+Application 46572076 resources: utime ~0s, stime ~0s, Rss ~3764, inblocks ~5678, outblocks ~14955
+n = 500, n_threads=4, simulation time = 0.111219 seconds
+Application 46572079 resources: utime ~0s, stime ~0s, Rss ~3764, inblocks ~5678, outblocks ~14955
+n = 500, n_threads=6, simulation time = 0.12562 seconds
+Application 46572080 resources: utime ~0s, stime ~0s, Rss ~3764, inblocks ~5678, outblocks ~14955
+n = 500, n_threads=12, simulation time = 0.222419 seconds
+Application 46572083 resources: utime ~1s, stime ~0s, Rss ~3764, inblocks ~5678, outblocks ~14955
+n = 500, n_threads=18, simulation time = 0.383621 seconds
+Application 46572084 resources: utime ~1s, stime ~1s, Rss ~3764, inblocks ~5678, outblocks ~14955
+n = 500, n_threads=24, simulation time = 0.57204 seconds
+Application 46572085 resources: utime ~1s, stime ~1s, Rss ~3764, inblocks ~5678, outblocks ~14955
+n = 1000, n_threads=2, simulation time = 0.28674 seconds
+Application 46572087 resources: utime ~1s, stime ~0s, Rss ~5032, inblocks ~5678, outblocks ~14955
+n = 2000, n_threads=4, simulation time = 0.380108 seconds
+Application 46572090 resources: utime ~2s, stime ~0s, Rss ~9360, inblocks ~5678, outblocks ~14955
+n = 3000, n_threads=6, simulation time = 0.475044 seconds
+Application 46572091 resources: utime ~3s, stime ~0s, Rss ~13840, inblocks ~5678, outblocks ~14955
+n = 6000, n_threads=12, simulation time = 0.876275 seconds
+Application 46572093 resources: utime ~9s, stime ~0s, Rss ~27064, inblocks ~5678, outblocks ~14955
+n = 9000, n_threads=18, simulation time = 1.28194 seconds
+Application 46572095 resources: utime ~19s, stime ~1s, Rss ~40244, inblocks ~5678, outblocks ~14955
+n = 12000, n_threads=24, simulation time = 1.36878 seconds
+Application 46572097 resources: utime ~25s, stime ~1s, Rss ~53008, inblocks ~5678, outblocks ~14955
+
+Strong scaling estimates are :
+    0.90    0.94    1.21    1.07    0.61    0.35    0.24 (speedup)
+    0.90    0.47    0.30    0.18    0.05    0.02    0.01 (efficiency)    for
+       1       2       4       6      12      18      24 threads/processors
+
+Average strong scaling efficiency:    0.28 
+
+Weak scaling estimates are :
+    0.90    0.47    0.35    0.28    0.15    0.11    0.10 (efficiency)    for
+       1       2       4       6      12      18      24 threads/processors
+
+Average weak scaling efficiency:    0.34 
+
+
+ + --------------------------------------------------------------------------
+ +        Job name: auto-hopper-pthreads24
+ +          Job Id: 8817998.hopque01
+ +          System: hopper
+ +     Queued Time: Mon Mar  2 08:38:43 2015
+ +      Start Time: Mon Mar  2 08:41:21 2015
+ + Completion Time: Mon Mar  2 08:41:43 2015
+ +            User: suhang
+ +        MOM Host: nid04945
+ +           Queue: debug
+ +  Req. Resources: mppdepth=24,mppnodect=1,mppnppn=1,mppwidth=1,walltime=00:20:00
+ +  Used Resources: cput=00:00:00,energy_used=0,mem=1572kb,vmem=12868kb,walltime=00:00:25
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/u1/s/suhang/projects/cs267/cs267-hw2/src/bin
+ +     Submit Args: -f auto-hopper-pthreads24
+ + --------------------------------------------------------------------------
+

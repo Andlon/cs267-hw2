@@ -67,15 +67,15 @@
 \maketitle
 \vspace{-8mm}
 \begin{abstract}
-This report investigates the parallelization of Particle Simulation using different parallelization models. 
-We parallelize particle simulations using OpenMP, Pthreads and MPI, and compare their scaling performances.
+This report investigates the parallelization of particle simulation using different parallelization models.
+OpenMP, Pthreads, MPI and CUDA are used for parallelization, and their scaling performances are compared.
 We show that these techniques can effectively speed up the simulation, achieving an 40\% average scaling efficiency.
 percentage of Peak could be achieved.
 \end{abstract}
 
 \section{Introduction}
-Particle simulation are used in mechanics, biology, astronomy, etc. In this assignment, we will parallelize 
-a toy particle simulator.
+Particle simulation are used in mechanics, biology, astronomy, etc. In this assignment, a toy particle simulator is
+parallelized using different parallelization models.
 
 Naive particle simulation requires a complexity of $O(n^2)$ as forces between every pair of particles are computed.
 However, if appropriate approximation is applied, we could reduce the complexity to $O(n)$. The approximation lies in
@@ -109,7 +109,8 @@ update status of each particles concerning only the interaction between nearby b
 \section{Parallelization}
 \subsection{Shared Memory Models}
 OpenMP and Pthreads are two progamming models for shared memory parallelization. We implement both of them and try to 
-compare the performance.
+compare their performance. Synchronization is done after each of the parallel block to eliminate race condition. Lock
+is used for parallel updating bin information.
 
 \begin{table}[htb]
   \centering
@@ -124,7 +125,9 @@ compare the performance.
 \end{table}
 
 \subsection{Distributed Memory Model}
-We use MPI \cite{mpi} as parallelization model in this section. An basic approach would be describes as
+We use MPI \cite{mpi} as distributed memory parallelization model in this section. The strategy is that we first broadcast
+all the particles information to all the nodes, and then we bin particles in each of these nodes. And finally, we 
+compute forces for a subset of particles in each node and move them. The pesudo code is shown as below.
 
 \begin{table}[htb]
   \centering
@@ -138,12 +141,36 @@ We use MPI \cite{mpi} as parallelization model in this section. An basic approac
   \label{tab:mpi_naive}
 \end{table}
 
+\subsection{CUDA}
+
+
 \section{Experiments}
-\subsection{Serial Implementation}
+\subsection{Complexity}
+Figure~\ref{fig:loglogOn} shows the log-log scale plot for serial and parallel codes run in O(n) time.
 
-\subsection{Shared Memory Models}
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{graphics/loglogOn.png}
+  \caption{Log-log scale plot for serial and parallel codes}
+  \label{fig:loglogOn}
+\end{figure}
 
-\subsection{Distributed Memory Models}
+\subsection{Speedup}
+Figure~\ref{fig:speedup} shows the speed up factor for different parallel implementation when number of particles is 500.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{graphics/speedup.png}
+  \caption{Speedup plot for parallel codes}
+  \label{fig:speedup}
+\end{figure}
+As is shown in the figure, pthreads perform worst in this setup. But if we increase the number of particles to 16000,
+we end up with similar speedups for pthreads and openMP (Figure~\ref{fig:speedup-16000}).
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{graphics/speedup-16000.png}
+  \caption{Speedup plot for parallel codes (num particles = 16000)}
+  \label{fig:speedup-16000}
+\end{figure}
 
 \subsection{Discussions}
 
