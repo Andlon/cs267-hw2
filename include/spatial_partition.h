@@ -13,7 +13,8 @@ struct partitioned_storage {
 
     // Holds the particles, sorted such that for two particles a and b,
     // where a comes before b in the set,
-    // partition(a) <= particle(b)
+    // partition(a) <= particle(b),
+    // assuming partition(storage, grid) has been called
     std::vector<particle_t> particles;
 
     // size of 'partitions' is equal to number of partitions.
@@ -23,7 +24,7 @@ struct partitioned_storage {
     // partitions[1] = 34;
     // would mean that the particles in partition 0 can be found in
     // particles[0], ..., particles[26]
-    // and the particle in partition 1 can be found in
+    // and the particles in partition 1 can be found in
     // particles[27], ..., particles[33]
     std::vector<size_t> partitions;
 };

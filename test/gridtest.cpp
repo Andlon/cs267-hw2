@@ -13,12 +13,12 @@ TEST_CASE("grid class members", "[grid]") {
         }
 
         SECTION("basic bin division") {
-            REQUIRE(grid.bins_per_dim() == 3);
-            REQUIRE(grid.binsize() == Approx(3.2 / 3));
+            REQUIRE(grid.partitions_per_dim() == 3);
+            REQUIRE(grid.partition_size() == Approx(3.2 / 3));
         }
 
         SECTION("bin count") {
-            REQUIRE(grid.bincount() == 9);
+            REQUIRE(grid.partition_count() == 9);
         }
     }
 }

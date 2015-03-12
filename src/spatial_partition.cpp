@@ -32,7 +32,7 @@ bool particles_equal(const particle_t & a, const particle_t & b) {
 
 partitioned_storage::partitioned_storage(const grid &particle_grid)
     : particles(particle_grid.particle_count()),
-      partitions(particle_grid.bincount())
+      partitions(particle_grid.partition_count())
 {
 
 }
@@ -85,13 +85,13 @@ void compute_particle_forces(partitioned_storage &storage, const grid &grid, par
 {
     particle.ax = particle.ay = 0;
 
-    int x0 = ((int) particle.partition) % grid.bins_per_dim();
-    int y0 = ((int) particle.partition) / grid.bins_per_dim();
+    int x0 = ((int) particle.partition) % grid.partitions_per_dim();
+    int y0 = ((int) particle.partition) / grid.partitions_per_dim();
 
     // Skip validity checks on neighborhood for interior partitions
-    if (grid.bins_per_dim() > 2 &&
-            in_range(x0, 1, grid.bins_per_dim() - 1) &&
-            in_range(y0, 1, grid.bins_per_dim() - 1))
+    if (grid.partitions_per_dim() > 2 &&
+            in_range(x0, 1, grid.partitions_per_dim() - 1) &&
+            in_range(y0, 1, grid.partitions_per_dim() - 1))
     {
         // Iterate over neighborhood (includes partition containing particle)
         for (const auto & location : NEIGHBORHOOD)
@@ -100,7 +100,7 @@ void compute_particle_forces(partitioned_storage &storage, const grid &grid, par
             int y = y0 + location.y;
 
             // Interact with particles in partition
-            size_t partition_index = static_cast<size_t> (x + y * grid.bins_per_dim());
+            size_t partition_index = static_cast<size_t> (x + y * grid.partitions_per_dim());
             compute_particle_forces_in_partition(storage, particle, partition_index,
                                                  dmin, davg, navg);
         }
@@ -114,11 +114,11 @@ void compute_particle_forces(partitioned_storage &storage, const grid &grid, par
             int y = y0 + location.y;
 
             // Check for validity in case of boundaries
-            if (    in_range(x, 0, grid.bins_per_dim()) &&
-                    in_range(y, 0, grid.bins_per_dim()))
+            if (    in_range(x, 0, grid.partitions_per_dim()) &&
+                    in_range(y, 0, grid.partitions_per_dim()))
             {
                 // Partition is valid. Interact with particles in partition
-                size_t partition_index = static_cast<size_t> (x + y * grid.bins_per_dim());
+                size_t partition_index = static_cast<size_t> (x + y * grid.partitions_per_dim());
                 compute_particle_forces_in_partition(storage, particle, partition_index,
                                                      dmin, davg, navg);
             }
@@ -157,5 +157,5 @@ void move_particles(std::vector<particle_t> &particles)
 void update_partitions(std::vector<particle_t> &particles, const grid &grid)
 {
     for (auto & particle : particles)
-        particle.partition = determine_bin_for_particle(grid, particle);
+        particle.partition = determine_partition_for_particle(grid, particle);
 }

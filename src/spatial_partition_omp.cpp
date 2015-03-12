@@ -61,7 +61,7 @@ void parallel_partition(partitioned_storage &storage, const grid &grid)
     assert(storage.partitions.size() > 0);
 
     for (auto & particle : storage.particles)
-        particle.partition = determine_bin_for_particle(grid, particle);
+        particle.partition = determine_partition_for_particle(grid, particle);
 
     // Sort all the particles by their partition indices
     __gnu_parallel::sort(storage.particles.begin(), storage.particles.end(),

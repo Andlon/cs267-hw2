@@ -36,7 +36,7 @@ int main( int argc, char **argv )
     set_size( n );
     grid particle_grid(n, get_size(), get_cutoff());
     partitioned_storage storage(particle_grid);
-    init_particles( n, &storage.particles[0] );
+    init_particles( n, storage.particles.data() );
     
     //  simulate a number of time steps
     double simulation_time = read_timer( );
@@ -64,7 +64,7 @@ int main( int argc, char **argv )
 
             //  save if necessary
             if( fsave && (step%SAVEFREQ) == 0 )
-                save( fsave, n, &storage.particles[0] );
+                save( fsave, n, storage.particles.data() );
         }
     }
     simulation_time = read_timer( ) - simulation_time;
