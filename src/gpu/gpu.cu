@@ -184,14 +184,17 @@ int main( int argc, char **argv )
         printf( "-h to see this help\n" );
         printf( "-n <int> to set the number of particles\n" );
         printf( "-o <filename> to specify the output file name\n" );
+        printf( "-s <filename> to specify a summary file name\n" );
         return 0;
     }
     
     int n = read_int( argc, argv, "-n", 1000 );
 
     char *savename = read_string( argc, argv, "-o", NULL );
+    char *sumname = read_string( argc, argv, "-s", NULL );
     
     FILE *fsave = savename ? fopen( savename, "w" ) : NULL;
+    FILE *fsum = sumname ? fopen ( sumname, "a" ) : NULL;
     particle_t *particles = (particle_t*) malloc( n * sizeof(particle_t) );
 
     // GPU particle data structure
@@ -261,6 +264,9 @@ int main( int argc, char **argv )
     
     printf( "CPU-GPU copy time = %g seconds\n", copy_time);
     printf( "n = %d, simulation time = %g seconds\n", n, simulation_time );
+    
+    if( fsum) 
+        fprintf(fsum,"%d %g\n",n,simulation_time);
     
     free( particles );
     cudaFree(d_particles);

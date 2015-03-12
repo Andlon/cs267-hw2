@@ -167,6 +167,7 @@ Figure~\ref{fig:speedup} shows the speed up factor for different parallel implem
   \caption{Speedup plot for parallel codes}
   \label{fig:speedup}
 \end{figure}
+
 As is shown in the figure, pthreads perform worst in this setup. But if we increase the number of particles to 16000,
 we end up with similar speedups for pthreads and openMP (Figure~\ref{fig:speedup-16000}).
 \begin{figure}[htb]
@@ -176,10 +177,25 @@ we end up with similar speedups for pthreads and openMP (Figure~\ref{fig:speedup
   \label{fig:speedup-16000}
 \end{figure}
 
-\subsection{Discussions}
+\subsection{Weak scaling}
+
+\subsection{CUDA}
+
+\section{Discussions}
+\subsection{Pthreads v.s. openMP v.s. CUDA}
+OpenMP is easier to implement and the overhead is well-managed. However, Pthreads is more flexible -- one could call
+different routines together. In general, these two methods are similar to each other in that they are similar memory
+sharing strategy. CUDA is more powerful for massive parallelization. However, it requires memory management for devices,
+and it is a bit difficult to scale up.
+
+\subsection{Shared memory model v.s. distributed memory model}
+Shared memory models are easier to implement, and they tend to give better speedup performance. However, distributed memory 
+models can scale up massively.
 
 \section{Conclusion}
-
+Different parallelization models are shown to be effective in parallelizing particle simulations. Of the four parallelization models,
+CUDA is shown to be most effective in the simulation. Pthreads and openMP may achieve an average of 40\% scaling factor, while
+MPI is 
 
 % include your own bib file like this:
 \bibliographystyle{acl}
