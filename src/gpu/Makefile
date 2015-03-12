@@ -3,7 +3,7 @@ all:
 
 include ../particle.mk
 
-CXX_SRCS := gpu.cu gpu_default.cu
+CXX_SRCS := gpu.cu gpu_default.cu gpu_backup.cu
 
 BINFILES = $(CXX_SRCS:.cu=)
 
