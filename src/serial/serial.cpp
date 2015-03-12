@@ -12,6 +12,8 @@ int main( int argc, char **argv )
 {    
     int navg,nabsavg=0;
     double davg,dmin, absmin=1.0, absavg=0.0;
+    int max_particles_in_bin;
+    int max_bin_size;
 
     if( find_option( argc, argv, "-h" ) >= 0 )
     {
@@ -49,16 +51,20 @@ int main( int argc, char **argv )
         navg = 0;
         davg = 0.0;
         dmin = 1.0;
+        max_bin_size = 0;
 
         //  assign particles to bins
         bin_particles(bins, particles, n);
-        
+
         //
         //  compute forces in bin
         //
         if( find_option( argc, argv, "-no" ) == -1 ) {
           for (int i = 0; i < n_bins; i++) {
             apply_force_bin (bins, i, &dmin,davg,navg);
+            if (bins[i].num_particles() > max_bin_size) {
+              max_bin_size = bins[i].num_particles();
+            }
           }
         } else {
           for (int i = 0; i < n_bins; i++) {
@@ -91,6 +97,8 @@ int main( int argc, char **argv )
             nabsavg++;
           }
           if (dmin < absmin) absmin = dmin;
+
+          if (max_particles_in_bin < max_bin_size) max_particles_in_bin = max_bin_size;
         
           //
           //  save if necessary
@@ -113,7 +121,7 @@ int main( int argc, char **argv )
     //
     //  -The average distance absavg is ~.95 when most particles are interacting correctly and ~.66 when no particles are interacting
     //
-    printf( ", absmin = %lf, absavg = %lf", absmin, absavg);
+    printf( ", absmin = %lf, absavg = %lf, max_particles_in_bin = %d", absmin, absavg, max_particles_in_bin);
     if (absmin < 0.4) printf ("\nThe minimum distance is below 0.4 meaning that some particle is not interacting");
     if (absavg < 0.8) printf ("\nThe average distance is below 0.8 meaning that most particles are not interacting");
     }

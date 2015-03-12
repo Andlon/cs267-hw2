@@ -142,7 +142,11 @@ compute forces for a subset of particles in each node and move them. The pesudo 
 \end{table}
 
 \subsection{CUDA}
-
+The CUDA implementation is like the openMP approach, as it could be seen as a shared memory parallelization model.
+The main difference here is that instead of allocating memories dynamically during particle binning, we allocate
+memory for bins before simulation begins (this requires an estimate of maximum number of particles in each bin, and
+we approximate this by recording that in simulation of serial code). During the simulation, we use atomicAdd to 
+track the status of each bin, and assign particle address to bins using the return value of atomicAdd function.
 
 \section{Experiments}
 \subsection{Complexity}

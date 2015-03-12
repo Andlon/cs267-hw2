@@ -111,8 +111,6 @@ __device__ void apply_force_particle_bin_gpu (particle_t &particle, int bin_id, 
         apply_force_gpu(particle, *(bins[neighbor_id * n_max_particles_per_bin + j]));
       }
     }
-
-
 }
 
 __global__ void compute_forces_bin_gpu (particle_t ** bins, int * num_particles_in_bins, int n_bins_per_side, 
