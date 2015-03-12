@@ -6,6 +6,7 @@ pthreads
 serial
 autograder
 gpu
+serial_default
 
 # Ignore output from jobs
 *.txt

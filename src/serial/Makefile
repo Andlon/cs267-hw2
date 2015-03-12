@@ -3,7 +3,7 @@ all:
 
 include ../particle.mk
 
-CXX_SRCS := serial.cpp
+CXX_SRCS := serial.cpp serial_default.cpp
 
 BINFILES = $(CXX_SRCS:.cpp=)
 

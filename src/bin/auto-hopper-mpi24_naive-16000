@@ -1,0 +1,24 @@
+#PBS -V
+#PBS -l mppwidth=24
+#PBS -l walltime=0:20:00
+#PBS -o auto-mpi24_naive-16000.stdout
+#PBS -j oe
+#PBS -A mp309
+
+cd $PBS_O_WORKDIR
+rm mpi_naive-16000.txt
+aprun -d 1 -n 1 -N 1 ./serial -n 16000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 1 -N 1 ./mpi_naive -p 1 -n 16000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 2 -N 2 ./mpi_naive -p 2 -n 16000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 4 -N 4 ./mpi_naive -p 4 -n 16000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 6 -N 6 ./mpi_naive -p 6 -n 16000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 12 -N 12 ./mpi_naive -p 12 -n 16000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 18 -N 18 ./mpi_naive -p 18 -n 16000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 24 -N 24 ./mpi_naive -p 24 -n 16000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 2 -N 2 ./mpi_naive -p 2 -n 1000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 4 -N 4 ./mpi_naive -p 4 -n 2000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 6 -N 6 ./mpi_naive -p 6 -n 3000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 12 -N 12 ./mpi_naive -p 12 -n 6000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 18 -N 18 ./mpi_naive -p 18 -n 9000 -no -s mpi_naive-16000.txt
+aprun -d 1 -n 24 -N 24 ./mpi_naive -p 24 -n 12000 -no -s mpi_naive-16000.txt
+./autograder -v mpi -s mpi_naive-16000.txt
