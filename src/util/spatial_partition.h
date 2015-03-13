@@ -3,7 +3,6 @@
 
 #include <vector>
 #include <cstdlib>
-#include "common.h"
 #include "grid.h"
 
 // Stores a partitioned collection of particles. Storage format

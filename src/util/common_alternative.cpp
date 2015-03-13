@@ -6,7 +6,7 @@
 #include <math.h>
 #include <time.h>
 #include <sys/time.h>
-#include "common.h"
+#include "common_alternative.h"
 
 double size;
 

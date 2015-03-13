@@ -1,4 +1,4 @@
-#include <spatial_partition_omp.h>
+#include "spatial_partition_omp.h"
 #include <omp.h>
 #include <algorithm>
 #include <cassert>

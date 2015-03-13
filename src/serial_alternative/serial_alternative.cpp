@@ -1,10 +1,8 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <math.h>
-#include <common.h>
-#include <grid.h>
-#include <spatial_partition.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cassert>
+#include <cmath>
+#include "../util/spatial_partition.h"
 
 //
 //  benchmarking program

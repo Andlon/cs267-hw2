@@ -8,7 +8,7 @@ $(OBJFILES): %.o: %.cpp $(ADDHEADER)
 endif
 
 $(BINFILES): %: %.o $(ADDLIBS)
-	$(CC) $(LFLAGS) -o $@ $< $(ADDLIBS)
+	$(CC) $< $(ADDLIBS) $(LFLAGS) -o $@
 	-mv $@ ../bin
 
 all: $(BINFILES) $(OBJFILES)

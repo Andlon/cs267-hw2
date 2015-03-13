@@ -1,11 +1,9 @@
-#include <stdlib.h>
-#include <stdio.h>
-#include <assert.h>
-#include <grid.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cassert>
 #include <omp.h>
-#include "common.h"
-#include "spatial_partition_omp.h"
 #include <mpi.h>
+#include "../util/spatial_partition_omp.h"
 
 //
 //  benchmarking program

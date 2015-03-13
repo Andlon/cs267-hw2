@@ -13,4 +13,7 @@ ADDHEADER = ../util/common.h
 
 ADDLIBS = ../util/common.o
 
+# Ignore any warnings from building autograder
+CFLAGS = -w
+
 include ../default_rules.mk

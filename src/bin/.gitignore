@@ -1,9 +1,12 @@
 # Ignore executables
 mpi
 mpi_naive
+mpi_alternative
 openmp
+openmp_alternative
 pthreads
 serial
+serial_alternative
 autograder
 gpu
 gpu_default

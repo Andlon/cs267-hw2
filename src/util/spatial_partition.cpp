@@ -1,4 +1,4 @@
-#include <spatial_partition.h>
+#include "spatial_partition.h"
 #include <algorithm>
 #include <cassert>
 
@@ -156,6 +156,8 @@ void move_particles(std::vector<particle_t> &particles)
 
 void update_partitions(std::vector<particle_t> &particles, const grid &grid)
 {
-    for (auto & particle : particles)
+    for (auto & particle : particles) {
         particle.partition = determine_partition_for_particle(grid, particle);
+        assert(particle.partition < grid.partition_count());
+    }
 }

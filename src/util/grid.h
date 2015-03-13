@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <cstdio>
-#include "common.h"
+#include "common_alternative.h"
 
 // Returns true if x is in the (half-open) interval [a, b).
 // (Yeah, it doesn't really belong here in this header semantically speaking)
