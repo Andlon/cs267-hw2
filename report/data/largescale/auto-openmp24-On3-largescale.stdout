@@ -1,0 +1,48 @@
+ModuleCmd_Switch.c(172):ERROR:152: Module 'PrgEnv-pgi' is currently not loaded
+rm: cannot remove `openmp-On3-largescale.txt': No such file or directory
+n = 1000,threads = 3, simulation time = 0.22841 seconds
+Application 47595823 resources: utime ~1s, stime ~0s, Rss ~5576, inblocks ~43, outblocks ~62
+n = 2000,threads = 3, simulation time = 0.45813 seconds
+Application 47595835 resources: utime ~1s, stime ~0s, Rss ~9708, inblocks ~43, outblocks ~62
+n = 4000,threads = 3, simulation time = 0.90216 seconds
+Application 47595841 resources: utime ~3s, stime ~0s, Rss ~18180, inblocks ~43, outblocks ~62
+n = 8000,threads = 3, simulation time = 1.66083 seconds
+Application 47595846 resources: utime ~5s, stime ~0s, Rss ~34720, inblocks ~43, outblocks ~62
+n = 16000,threads = 3, simulation time = 3.18086 seconds
+Application 47595849 resources: utime ~9s, stime ~0s, Rss ~68136, inblocks ~43, outblocks ~62
+n = 32000,threads = 3, simulation time = 7.4599 seconds
+Application 47595856 resources: utime ~22s, stime ~0s, Rss ~134744, inblocks ~43, outblocks ~62
+n = 64000,threads = 3, simulation time = 17.4763 seconds
+Application 47595862 resources: utime ~52s, stime ~0s, Rss ~268424, inblocks ~43, outblocks ~62
+n = 128000,threads = 3, simulation time = 38.0411 seconds
+Application 47595872 resources: utime ~113s, stime ~1s, Rss ~534880, inblocks ~43, outblocks ~62
+n = 256000,threads = 3, simulation time = 80.6724 seconds
+Application 47595922 resources: utime ~241s, stime ~1s, Rss ~1069552, inblocks ~43, outblocks ~62
+n = 512000,threads = 3, simulation time = 168.411 seconds
+Application 47596015 resources: utime ~505s, stime ~1s, Rss ~2135380, inblocks ~43, outblocks ~62
+n = 1024000,threads = 3, simulation time = 351.086 seconds
+Application 47596182 resources: utime ~1052s, stime ~3s, Rss ~4270336, inblocks ~43, outblocks ~62
+
+Serial code is O(N^slope)
+Slope estimates are : 0.000000 0.000000 0.000000 0.000000 0.000000 0.000000 0.168336 0.156283 0.327282 0.302823 0.222526 0.205615 0.223518 0.206162 0.528226 0.486692 0.185297 0.170642 0.247787 0.228080 0.445202
+Slope estimate for line fit is: -nan
+
+
+
+ + --------------------------------------------------------------------------
+ +        Job name: auto-hopper-openmp24-On3-largescale
+ +          Job Id: 8880710.hopque01
+ +          System: hopper
+ +     Queued Time: Fri Mar 13 14:38:23 2015
+ +      Start Time: Fri Mar 13 14:38:48 2015
+ + Completion Time: Fri Mar 13 14:50:30 2015
+ +            User: andlon
+ +        MOM Host: nid03934
+ +           Queue: debug
+ +  Req. Resources: mppdepth=24,mppnodect=1,mppnppn=1,mppwidth=1,walltime=00:20:00
+ +  Used Resources: cput=00:00:00,energy_used=0,mem=5832kb,vmem=135180kb,walltime=00:11:45
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/u2/a/andlon/cs267-hw2/src/bin/largescale/openmp
+ +     Submit Args: auto-hopper-openmp24-On3-largescale
+ + --------------------------------------------------------------------------
+
