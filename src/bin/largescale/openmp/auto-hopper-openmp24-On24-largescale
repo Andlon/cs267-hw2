@@ -12,15 +12,15 @@ export OPENMP_OUTPUT=openmp-On24-largescale.txt
 rm $OPENMP_OUTPUT
 export OMP_NUM_THREADS=24
 
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 1000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 2000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 4000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 8000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 16000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 32000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 64000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 128000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 256000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 512000 -no -s $OPENMP_OUTPUT
-aprun -d 24 -n 1 -N 1 -S 1 ./../../openmp -p 24 -n 1024000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 1000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 2000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 4000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 8000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 16000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 32000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 64000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 128000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 256000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 512000 -no -s $OPENMP_OUTPUT
+aprun -d 24 -n 1 -N 1 ./../../openmp -p 24 -n 1024000 -no -s $OPENMP_OUTPUT
 ./../../autograder -v serial -s $OPENMP_OUTPUT
