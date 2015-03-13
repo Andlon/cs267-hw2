@@ -1,0 +1,211 @@
+%
+% File report.tex
+%
+% Contact: koller@ling.uni-potsdam.de, yusuke@nii.ac.jp
+%%
+%% Based on the style files for ACL-2013, which were, in turn,
+%% Based on the style files for ACL-2012, which were, in turn,
+%% based on the style files for ACL-2011, which were, in turn, 
+%% based on the style files for ACL-2010, which were, in turn, 
+%% based on the style files for ACL-IJCNLP-2009, which were, in turn,
+%% based on the style files for EACL-2009 and IJCNLP-2008...
+
+%% Based on the style files for EACL 2006 by 
+%%e.agirre@ehu.es or Sergi.Balari@uab.es
+%% and that of ACL 08 by Joakim Nivre and Noah Smith
+
+\documentclass[11pt]{article}
+\usepackage{report}
+\usepackage{times}
+\usepackage{url}
+\usepackage{latexsym}
+\usepackage{listings}
+\usepackage{amsmath}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{textcomp}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\restylefloat{table}
+
+\lstset{
+  language=C,                % choose the language of the code
+  backgroundcolor=\color{white},  % choose the background color. You must add \usepackage{color}
+  basicstyle=\ttfamily\scriptsize,
+  showspaces=false,               % show spaces adding particular underscores
+  showstringspaces=false,         % underline spaces within strings
+  showtabs=false,                 % show tabs within strings adding particular underscores
+  tabsize=2,                      % sets default tabsize to 2 spaces
+  captionpos=b,                   % sets the caption-position to bottom
+  breaklines=true,                % sets automatic line breaking
+  breakatwhitespace=true,         % sets if automatic breaks should only happen at whitespace
+}
+
+%\setlength\titlebox{5cm}
+
+% You can expand the titlebox if you need extra space
+% to show all the authors. Please do not make the titlebox
+% smaller than 5cm (the original size); we will check this
+% in the camera-ready version and ask you to change it back.
+
+
+\title{CS267 Assignment 2: Parallelize Particle Simulation}
+
+\author{Hang Su \\
+  Dept. of EECS, UC Berkeley \\
+  International Computer Science Institute \\
+  {\tt suhang3240@gmail.com}
+  \And
+  Andreas Borgen Longva \\
+  Dept. of Mathematics, UC Berkeley \\
+  NTNU \\
+  {\tt andreas.b.longva@gmail.com}
+}
+\date{}
+
+\begin{document}
+\maketitle
+\vspace{-8mm}
+\begin{abstract}
+This report investigates the parallelization of particle simulation using different parallelization models.
+OpenMP, Pthreads, MPI and CUDA are used for parallelization, and their scaling performances are compared.
+We show that these techniques can effectively speed up the simulation, achieving an 40\% average scaling efficiency.
+percentage of Peak could be achieved.
+\end{abstract}
+
+\section{Introduction}
+Particle simulation are used in mechanics, biology, astronomy, etc. In this assignment, a toy particle simulator is
+parallelized using different parallelization models.
+
+Naive particle simulation requires a complexity of $O(n^2)$ as forces between every pair of particles are computed.
+However, if appropriate approximation is applied, we could reduce the complexity to $O(n)$. The approximation lies in
+that only nearby particles have big influences on a particle, so we could divide the spaces into bins, and 
+update status of each particles concerning only the interaction between nearby bins.
+
+\begin{table}[htb]
+  \centering
+  \begin{tabular}{l}
+    \hline
+      Naive particle simulation\\
+    \hline
+      \lstinputlisting{samples/naive.cpp}\\
+    \hline
+  \end{tabular}
+  \label{tab:naive}
+\end{table}
+
+\begin{table}[htb]
+  \centering
+  \begin{tabular}{l}
+    \hline
+      Binned particle simulation\\
+    \hline
+      \lstinputlisting{samples/serial.cpp}\\
+    \hline
+  \end{tabular}
+  \label{tab:serial}
+\end{table}
+
+\section{Parallelization}
+\subsection{Shared Memory Models}
+OpenMP and Pthreads are two progamming models for shared memory parallelization. We implement both of them and try to 
+compare their performance. Synchronization is done after each of the parallel block to eliminate race condition. Lock
+is used for parallel updating bin information.
+
+\begin{table}[htb]
+  \centering
+  \begin{tabular}{l}
+    \hline
+      Shared Memory Parallelization\\
+    \hline
+      \lstinputlisting{samples/shared_memory.cpp}\\
+    \hline
+  \end{tabular}
+  \label{tab:shared_memory}
+\end{table}
+
+\subsection{Distributed Memory Model}
+We use MPI \cite{mpi} as distributed memory parallelization model in this section. The strategy is that we first broadcast
+all the particles information to all the nodes, and then we bin particles in each of these nodes. And finally, we 
+compute forces for a subset of particles in each node and move them. The pesudo code is shown as below.
+
+\begin{table}[htb]
+  \centering
+  \begin{tabular}{l}
+    \hline
+      MPI Parallelization\\
+    \hline
+      \lstinputlisting{samples/mpi_naive.cpp}\\
+    \hline
+  \end{tabular}
+  \label{tab:mpi_naive}
+\end{table}
+
+\subsection{CUDA}
+The CUDA implementation is like the openMP approach, as it could be seen as a shared memory parallelization model.
+The main difference here is that instead of allocating memories dynamically during particle binning, we allocate
+memory for bins before simulation begins (this requires an estimate of maximum number of particles in each bin, and
+we approximate this by recording that in simulation of serial code). During the simulation, we use atomicAdd to 
+track the status of each bin, and assign particle address to bins using the return value of atomicAdd function.
+
+\section{Experiments}
+\subsection{Complexity}
+Figure~\ref{fig:loglogOn} shows the log-log scale plot for serial and parallel codes run in O(n) time.
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{graphics/loglogOn.png}
+  \caption{Log-log scale plot for serial and parallel codes}
+  \label{fig:loglogOn}
+\end{figure}
+
+\subsection{Speedup}
+Figure~\ref{fig:speedup} shows the speed up factor for different parallel implementation when number of particles is 500.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{graphics/speedup.png}
+  \caption{Speedup plot for parallel codes}
+  \label{fig:speedup}
+\end{figure}
+
+As is shown in the figure, pthreads perform worst in this setup. But if we increase the number of particles to 16000,
+we end up with similar speedups for pthreads and openMP (Figure~\ref{fig:speedup-16000}).
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{graphics/speedup-16000.png}
+  \caption{Speedup plot for parallel codes (num particles = 16000)}
+  \label{fig:speedup-16000}
+\end{figure}
+
+\subsection{Weak scaling}
+
+\subsection{CUDA}
+Figure~\ref{fig:gpu} shows the performance of our code versus the naive GPU code.
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{graphics/gpu.png}
+  \caption{Log-log plot for gpu performance)}
+  \label{fig:gpu}
+\end{figure}
+
+\section{Discussions}
+\subsection{Pthreads v.s. openMP v.s. CUDA}
+OpenMP is easier to implement and the overhead is well-managed. However, Pthreads is more flexible -- one could call
+different routines together. In general, these two methods are similar to each other in that they are similar memory
+sharing strategy. CUDA is more powerful for massive parallelization. However, it requires memory management for devices,
+and it is a bit difficult to scale up.
+
+\subsection{Shared memory model v.s. distributed memory model}
+Shared memory models are easier to implement, and they tend to give better speedup performance. However, distributed memory 
+models can scale up massively.
+
+\section{Conclusion}
+Different parallelization models are shown to be effective in parallelizing particle simulations. Of the four parallelization models,
+CUDA is shown to be most effective in the simulation. Pthreads and openMP may achieve an average of 40\% scaling factor, while
+MPI is 
+
+% include your own bib file like this:
+\bibliographystyle{acl}
+\bibliography{report}
+
+\end{document}

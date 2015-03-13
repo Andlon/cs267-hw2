@@ -1,0 +1,62 @@
+Warning: no access to tty (Bad file descriptor).
+Thus no job control in this shell.
+n = 500, simulation time = 0.13481 seconds
+Application 46571739 resources: utime ~0s, stime ~0s, Rss ~3768, inblocks ~5669, outblocks ~14916
+n = 500, n_proc = 1, simulation time = 0.132077 seconds
+Application 46571740 resources: utime ~0s, stime ~0s, Rss ~5604, inblocks ~5726, outblocks ~14919
+n = 500, n_proc = 2, simulation time = 0.098879 seconds
+Application 46571743 resources: utime ~1s, stime ~0s, Rss ~5952, inblocks ~5745, outblocks ~14919
+n = 500, n_proc = 4, simulation time = 0.08905 seconds
+Application 46571744 resources: utime ~3s, stime ~0s, Rss ~6008, inblocks ~5787, outblocks ~14919
+n = 500, n_proc = 6, simulation time = 0.091677 seconds
+Application 46571745 resources: utime ~3s, stime ~0s, Rss ~5796, inblocks ~5829, outblocks ~14919
+n = 500, n_proc = 12, simulation time = 0.092745 seconds
+Application 46571747 resources: utime ~4s, stime ~0s, Rss ~5900, inblocks ~5956, outblocks ~14920
+n = 500, n_proc = 18, simulation time = 0.097803 seconds
+Application 46571748 resources: utime ~3s, stime ~1s, Rss ~6980, inblocks ~6082, outblocks ~14920
+n = 500, n_proc = 24, simulation time = 0.100818 seconds
+Application 46571749 resources: utime ~4s, stime ~1s, Rss ~7096, inblocks ~6208, outblocks ~14921
+n = 1000, n_proc = 2, simulation time = 0.213633 seconds
+Application 46571751 resources: utime ~1s, stime ~0s, Rss ~8096, inblocks ~5745, outblocks ~14919
+n = 2000, n_proc = 4, simulation time = 0.392841 seconds
+Application 46571757 resources: utime ~2s, stime ~0s, Rss ~12564, inblocks ~5787, outblocks ~14919
+n = 3000, n_proc = 6, simulation time = 0.687649 seconds
+Application 46571758 resources: utime ~5s, stime ~0s, Rss ~16252, inblocks ~5829, outblocks ~14919
+n = 6000, n_proc = 12, simulation time = 1.76335 seconds
+Application 46571760 resources: utime ~23s, stime ~1s, Rss ~28940, inblocks ~5956, outblocks ~14920
+n = 9000, n_proc = 18, simulation time = 3.31298 seconds
+Application 46571763 resources: utime ~63s, stime ~2s, Rss ~42588, inblocks ~6082, outblocks ~14920
+n = 12000, n_proc = 24, simulation time = 4.81585 seconds
+Application 46571779 resources: utime ~121s, stime ~5s, Rss ~54888, inblocks ~6208, outblocks ~14921
+
+Strong scaling estimates are :
+    1.02    1.36    1.51    1.47    1.45    1.38    1.34 (speedup)
+    1.02    0.68    0.38    0.25    0.12    0.08    0.06 (efficiency)    for
+       1       2       4       6      12      18      24 threads/processors
+
+Average strong scaling efficiency:    0.37 
+
+Weak scaling estimates are :
+    1.02    0.63    0.34    0.20    0.08    0.04    0.03 (efficiency)    for
+       1       2       4       6      12      18      24 threads/processors
+
+Average weak scaling efficiency:    0.33 
+
+
+ + --------------------------------------------------------------------------
+ +        Job name: auto-hopper-mpi24_naive
+ +          Job Id: 8817986.hopque01
+ +          System: hopper
+ +     Queued Time: Mon Mar  2 08:33:53 2015
+ +      Start Time: Mon Mar  2 08:35:05 2015
+ + Completion Time: Mon Mar  2 08:35:37 2015
+ +            User: suhang
+ +        MOM Host: nid05620
+ +           Queue: debug
+ +  Req. Resources: mppnodect=1,mppnppn=24,mppwidth=24,walltime=00:20:00
+ +  Used Resources: cput=00:00:02,energy_used=0,mem=7468kb,vmem=227296kb,walltime=00:00:34
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/u1/s/suhang/projects/cs267/cs267-hw2/src/bin
+ +     Submit Args: -f auto-hopper-mpi24_naive
+ + --------------------------------------------------------------------------
+

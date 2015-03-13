@@ -1,13 +1,18 @@
 # Ignore executables
 mpi
+mpi_naive
 openmp
 pthreads
 serial
 autograder
+gpu
+gpu_default
+gpu_backup
+serial_default
 
 # Ignore test binaries
 test/
 
 # Ignore output from jobs
-mpi.txt
+*.txt
 *.stdout
