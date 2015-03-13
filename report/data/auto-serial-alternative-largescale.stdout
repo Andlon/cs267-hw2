@@ -1,0 +1,50 @@
+Warning: no access to tty (Bad file descriptor).
+Thus no job control in this shell.
+ModuleCmd_Switch.c(172):ERROR:152: Module 'PrgEnv-pgi' is currently not loaded
+rm: cannot remove `serial-alternative-largescale.txt': No such file or directory
+n = 1000, simulation time = 0.248593 seconds
+Application 47588817 resources: utime ~0s, stime ~0s, Rss ~4972, inblocks ~40, outblocks ~63
+n = 2000, simulation time = 0.507989 seconds
+Application 47588826 resources: utime ~1s, stime ~0s, Rss ~4972, inblocks ~40, outblocks ~63
+n = 4000, simulation time = 1.03641 seconds
+Application 47588827 resources: utime ~1s, stime ~0s, Rss ~4972, inblocks ~40, outblocks ~63
+n = 8000, simulation time = 2.13197 seconds
+Application 47588830 resources: utime ~2s, stime ~0s, Rss ~4972, inblocks ~40, outblocks ~63
+n = 16000, simulation time = 4.51362 seconds
+Application 47588846 resources: utime ~5s, stime ~0s, Rss ~4972, inblocks ~40, outblocks ~63
+n = 32000, simulation time = 9.35615 seconds
+Application 47588857 resources: utime ~9s, stime ~0s, Rss ~4972, inblocks ~40, outblocks ~63
+n = 64000, simulation time = 20.1371 seconds
+Application 47588869 resources: utime ~20s, stime ~0s, Rss ~7144, inblocks ~40, outblocks ~63
+n = 128000, simulation time = 44.9549 seconds
+Application 47588895 resources: utime ~45s, stime ~0s, Rss ~13428, inblocks ~40, outblocks ~63
+n = 256000, simulation time = 93.9387 seconds
+Application 47588951 resources: utime ~94s, stime ~0s, Rss ~25836, inblocks ~40, outblocks ~63
+n = 512000, simulation time = 195.76 seconds
+Application 47589043 resources: utime ~196s, stime ~0s, Rss ~50916, inblocks ~40, outblocks ~63
+n = 1024000, simulation time = 402.723 seconds
+Application 47589194 resources: utime ~403s, stime ~0s, Rss ~100812, inblocks ~40, outblocks ~63
+
+Serial code is O(N^slope)
+Slope estimates are : 1.031012 1.028726 1.040592 1.082098 1.051630 1.105869 1.158622 1.063241 1.059294 1.040702
+Slope estimate for line fit is: 1.073903
+
+
+
+ + --------------------------------------------------------------------------
+ +        Job name: auto-hopper-serial-alternative-largescale
+ +          Job Id: 8880089.hopque01
+ +          System: hopper
+ +     Queued Time: Fri Mar 13 13:09:52 2015
+ +      Start Time: Fri Mar 13 13:10:25 2015
+ + Completion Time: Fri Mar 13 13:23:53 2015
+ +            User: andlon
+ +        MOM Host: nid05610
+ +           Queue: debug
+ +  Req. Resources: mppdepth=1,mppnodect=1,mppnppn=1,mppwidth=1,walltime=00:20:00
+ +  Used Resources: cput=00:00:00,energy_used=0,mem=0kb,vmem=0kb,walltime=00:13:30
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/u2/a/andlon/cs267-hw2/src/bin
+ +     Submit Args: auto-hopper-serial-alternative-largescale
+ + --------------------------------------------------------------------------
+
