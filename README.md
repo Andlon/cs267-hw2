@@ -1,6 +1,8 @@
 Assignment 2 - CS267
 ====================
 
+NOTE: THIS IS OUT OF DATE. WILL UPDATE SOON
+
 Usage
 -----------
 Note that the PGI compiler suite is expected to be used.
