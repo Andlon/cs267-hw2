@@ -206,13 +206,51 @@ OpenMP is easier to implement and the overhead is well-managed. However, Pthread
 sharing strategy. CUDA is more powerful for massive parallelization. However, it requires memory management for devices, and it is a bit difficult to scale up.
 
 \subsection{Shared memory model v.s. distributed memory model}
-Shared memory models are easier to implement, and they tend to give better speedup performance. However, distributed memory models can scale up massively.
+Shared memory models like OpenMP and Pthreads are easier to implement, and they tend to give better speedup performance. However, it does not scale very well, as it is limited by hardware constraints. Distributed memory solutions like MPI can scale to massively large problems. It is sometimes possible to get the best of both worlds, implementing shared memory parallelization on individual MPI nodes. This is to an extent somethign we experimented with, but the bottlenecks in our MPI implementation seemed to limit the usefulness of this approach.
 
+\subsection{Breakdown of serial computation and implications for MPI}
+When we set out to work on the MPI part of the project, we initially assumed that the partitioning of the particles would be significantly cheaper than the computation of forces. This steered our initial design process. After profiling our serial implementation with \emph{Valgrind}, however, and after making necessary optimizations, it turned out that roughly 20 \% of the computation time on every iteration was spent in the partitioning process. Hence, for an MPI implementation, parallelizing the partitioning process is essential. On top of that, the profiling tool $IPM$ confirms that our MPI implementation spends an increasing amount of time communicating as the problem size increases, and so the communication cost of doing the partition for the entire domain on a single node and communicating the result is prohibitively expensive. Unfortunately we never got to the point where we could finish an implementation which deals with this issue, but the next section discusses an algorithm that would hopefully improve upon these weaknesses in our current implementation.
+
+\FloatBarrier
+
+\section{Reducing communication and synchronization}
+This section introduces an algorithm that we intended as the next step for our MPI implementation, but never had the time to implement it. Using the terminology from introduction, it is a stateful algorithm in that it subdivides the domain into subdomains which are responsible for the particles that reside in that particular subdomain. No single node has access to all particles at any time during the simulation. The root node scatters the initial data and gathers the result at the end. To hopefully clarify matters, we introduce some terminology that will be used in the algorithm.
+
+\subsection{Terminology}
+The \emph{domain} is the physical domain all the particles in the simulation reside in. The domain has a physical size, which in this case is two-dimensional and square.
+
+A \emph{subdomain} is a subset of the domain with the following properties:
+\begin{itemize}
+\item Contains a set of particles which physically reside in the subdomain.
+\item Contains a set of ghost particles, called the ghost layer, which reside in neighboring subdomains and are close enough to the subdomain to interact with the particles inside it.
+\item Has a predetermined physical size.
+\end{itemize}
+
+\subsection{Description}
+Given $n$ particles and $P$ processors, the pseudocode in table \ref{tab:reduce_communication} describes the task to be executed on a single node. Unless otherwise specified, every line is executed by every processor.
+
+\begin{table}[htb]
+  \centering
+  \begin{tabular}{l}
+    \hline
+      Reducing Communication\\
+    \hline
+      \lstinputlisting{samples/reduce_communication.cpp}\\
+    \hline
+  \end{tabular}
+  \label{tab:reduce_communication}
+\end{table}
+
+\subsection{MPI-specific details}
+The synchronization block in the pseudo code can be implemented as an MPI\_Alltoallv call. The desired effect is that all processors efficiently exchange particles in such a way that each processor is only given the minimum amount of particles it needs to compute the forces for all particles in his domain. All calls outside the synchronization blocks can be calls to functions from the serial implementation, partitioning the subdomain as appropriate, or they can be parallelized using for example OpenMP or CUDA.	
+
+Hopper has 4 ccNUMA nodes on each compute node. The aforementioned algorithm could be a good candidate for running 4 MPI tasks per node, with 6 OpenMP threads running on each MPI node. 
+
+\FloatBarrier
 \section{Conclusion}
-Different parallelization models are shown to be effective in parallelizing particle simulations. Looking at our implementations of the four parallelization models, CUDA is shown to be most effective in the simulation. Pthreads and OpenMP may achieve an average of 40\% scaling factor for a problem of size $n = 500$, while MPI 
+Different parallelization models are shown to be effective in parallelizing particle simulations. Looking at our implementations of the four parallelization models, CUDA is shown to be most effective in the simulation. Pthreads and OpenMP may achieve an average of 40\% scaling factor for a problem of size $n = 500$. Our implementations leave a lot of room for improvement, particularly the MPI implementation, and we have brought forward some ideas to improve upon our work.1
 
 % include your own bib file like this:
 \bibliographystyle{acl}
-\bibliography{report}
 
 \end{document}
