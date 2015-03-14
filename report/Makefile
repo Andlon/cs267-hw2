@@ -1,9 +1,9 @@
 type = report
 
-all: $(type).tex $(type).bib
+all: $(type).tex
 	(cd graphics; make all)
 	pdflatex $(type)
-	bibtex $(type)
+	#bibtex $(type)
 	pdflatex $(type)
 	pdflatex $(type)
 	cp $(type).pdf ~/Desktop
