@@ -1,7 +1,7 @@
 set term png font "/usr/share/fonts/dejavu/DejaVuSerifCondensed.ttf" 23 size 1600,1200
 set output 'loglogOn_largescale.png'
 set xrange [ 1000:1024000 ]
-set yrange [ 0.02:1000 ]
+set yrange [ 0.1:1000 ]
 set key right bottom
 set logscale xy
 set xlabel "Number of particles"
