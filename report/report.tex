@@ -116,9 +116,7 @@ Pseudo-code for the naive $O(n^2)$ approach is presented in table \ref{tab:naive
 
 \section{Parallelization}
 \subsection{Shared Memory Models}
-OpenMP and Pthreads are two progamming models for shared memory parallelization. We implement both of them and try to 
-compare their performance. Synchronization is done after each of the parallel block to eliminate race condition. Lock
-is used for parallel updating bin information.
+OpenMP and Pthreads are two progamming models for shared memory parallelization. We implement both of them and try to compare their performance. See table \ref{tab:shared_memory} for pseudo code of our implementation. Synchronization is done after each one of the parallel blocks to eliminate race conditions. In order to allow for assigning the particles to bins in parallel, each bin has an associated lock. With a bin-size roughly equal to the cutoff size for particle interaction, we have that the number of bins, $b$, is usually much higher than the number of particles, $n$, i.e. $b >> n$. Thus most bins will be empty, and the contention for any given bin is likely to be very low. Still, there is likely a non-negligible overhead associated with locking and unlocking uncontended locks that frequently. See a discussion on an alternative parallel algorithm towards the end of this paper.
 
 \begin{table}[htb]
   \centering
@@ -132,10 +130,12 @@ is used for parallel updating bin information.
   \label{tab:shared_memory}
 \end{table}
 
+\FloatBarrier
+
 \subsection{Distributed Memory Model}
-We use MPI \cite{mpi} as distributed memory parallelization model in this section. The strategy is that we first broadcast
-all the particles information to all the nodes, and then we bin particles in each of these nodes. And finally, we 
-compute forces for a subset of particles in each node and move them. The pesudo code is shown as below.
+The distributed memory model that is explored in this assignment revolves around parallelizing our particle simulation using MPI. Our current MPI implementation is fairly naive. For every timestep, every node gets access to all the particles in the system, and then is assigned a share proportional to how many nodes there are. The node then bins all particles, before it computes forces for its local share of particles. After moving, the data is synchronized again in the next step. The pseudo code for the procedure can be found in table \ref{tab:mpi_naive}. Collective communication is used across the board, specifically MPI\_Scatterv and MPI\_Allgatherv.
+
+It is intuitively obvious that there is a lot of redundant communication going on using this scheme. In addition, every node spends a fair amount of processing power on doing the exact same task, namely partitioning the entire domain. Drawing from the experience of building this naive approach, we have come up with some ideas for how we might be able to alleviate this problem, which will be covered in a later section.
 
 \begin{table}[htb]
   \centering
@@ -183,16 +183,13 @@ Figure~\ref{fig:speedup} shows the speed up factor for different parallel implem
   \label{fig:speedup}
 \end{figure}
 
-As is shown in the figure, pthreads perform worst in this setup. But if we increase the number of particles to 16000,
-we end up with similar speedups for pthreads and openMP (Figure~\ref{fig:speedup-16000}).
+As is shown in the figure, Pthreads performs the worst in this setup. But if we increase the number of particles to 16000, the difference between Pthreads and OpenMP are much less pronounced (Figure~\ref{fig:speedup-16000}). 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.9\textwidth]{graphics/speedup-16000.png}
   \caption{Speedup plot for parallel codes (num particles = 16000)}
   \label{fig:speedup-16000}
 \end{figure}
-
-\subsection{Weak scaling}
 
 \subsection{CUDA}
 Figure~\ref{fig:gpu} shows the performance of our code versus the naive GPU code.
