@@ -26,6 +26,7 @@
 \usepackage{textcomp}
 \usepackage{graphicx}
 \usepackage{enumitem}
+\usepackage{placeins}
 \restylefloat{table}
 
 \lstset{
@@ -74,13 +75,16 @@ percentage of Peak could be achieved.
 \end{abstract}
 
 \section{Introduction}
-Particle simulation are used in mechanics, biology, astronomy, etc. In this assignment, a toy particle simulator is
-parallelized using different parallelization models.
+Particle simulation is commonly used in many branches of science, including mechanics, biology, astronomy, etc. In this assignment, a toy particle simulator is parallelized using different parallelization models.
 
-Naive particle simulation requires a complexity of $O(n^2)$ as forces between every pair of particles are computed.
-However, if appropriate approximation is applied, we could reduce the complexity to $O(n)$. The approximation lies in
-that only nearby particles have big influences on a particle, so we could divide the spaces into bins, and 
-update status of each particles concerning only the interaction between nearby bins.
+Naive particle simulation has a computational complexity of $O(n^2)$ in time, where $n$ is the number of particles in the simulation. This follows from the fact that every particle interacts with every other particle. For some problems, the interaction between distant particles is negligible or even completely non-existent. This is the case for the problem we are given in this assignment.
+
+Exploiting this property, the computational complexity may be brought down to $O(n)$. One way to accomplish this is spatial partitioning, or \emph{binning}. By partitioning the space into a set of appropriately sized bins, a particle only needs to interact with particles in the same or nearby bins.
+
+There are many ways to implement this, but most - if not all - of them belong to one of two categories: \emph{stateless} and \emph{stateful} solutions. In the stateless approach, an independent problem is solved on every time iteration. That is, the partitioning process is run completely for every time step, and each particle is assigned to a bin. In contrast, the stateful approach initially distributes particles into bins, but for every timestep, only the movement of particles are communicated between partitions. As such, each partition remembers which particles belong to that partition, which constitutes the state of the simulation.
+
+\section{Serial implementation}
+Pseudo-code for the naive $O(n^2)$ approach is presented in table \ref{tab:naive}. The straightforward way to improve on this by means of spatial partitioning is conceptually quite simple, and illustrated in table \ref{tab:serial}.
 
 \begin{table}[htb]
   \centering
@@ -105,6 +109,8 @@ update status of each particles concerning only the interaction between nearby b
   \end{tabular}
   \label{tab:serial}
 \end{table}
+
+\FloatBarrier
 
 \section{Parallelization}
 \subsection{Shared Memory Models}
