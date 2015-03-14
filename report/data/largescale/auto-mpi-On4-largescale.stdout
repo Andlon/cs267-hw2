@@ -1,0 +1,39 @@
+rm: cannot remove `mpi-On4-largescale.txt': No such file or directory
+n = 1000, n_proc = 4, simulation time = 0.162619 seconds
+Application 47608633 resources: utime ~1s, stime ~0s, Rss ~6236, inblocks ~5369, outblocks ~13697
+n = 2000, n_proc = 4, simulation time = 0.365961 seconds
+Application 47608643 resources: utime ~2s, stime ~0s, Rss ~10384, inblocks ~5369, outblocks ~13697
+n = 4000, n_proc = 4, simulation time = 0.86475 seconds
+Application 47608647 resources: utime ~4s, stime ~0s, Rss ~18860, inblocks ~5369, outblocks ~13697
+n = 8000, n_proc = 4, simulation time = 2.63707 seconds
+Application 47608653 resources: utime ~11s, stime ~0s, Rss ~35496, inblocks ~5369, outblocks ~13697
+n = 16000, n_proc = 4, simulation time = 6.92623 seconds
+Application 47608665 resources: utime ~28s, stime ~1s, Rss ~68144, inblocks ~5369, outblocks ~13697
+n = 32000, n_proc = 4, simulation time = 15.9108 seconds
+Application 47608678 resources: utime ~64s, stime ~1s, Rss ~134584, inblocks ~5369, outblocks ~13697
+n = 64000, n_proc = 4, simulation time = 34.6471 seconds
+Application 47608704 resources: utime ~139s, stime ~1s, Rss ~268216, inblocks ~5369, outblocks ~13697
+n = 128000, n_proc = 4, simulation time = 73.5689 seconds
+Application 47608764 resources: utime ~296s, stime ~2s, Rss ~534328, inblocks ~5369, outblocks ~13697
+n = 256000, n_proc = 4, simulation time = 154.305 seconds
+Application 47608829 resources: utime ~620s, stime ~4s, Rss ~1068524, inblocks ~5369, outblocks ~13697
+n = 512000, n_proc = 4, simulation time = 323.317 seconds
+Application 47608975 resources: utime ~1298s, stime ~8s, Rss ~2133372, inblocks ~5369, outblocks ~13697
+
+ + --------------------------------------------------------------------------
+ +        Job name: auto-hopper-mpi-On4-largescale
+ +          Job Id: 8881662.hopque01
+ +          System: hopper
+ +     Queued Time: Fri Mar 13 18:03:30 2015
+ +      Start Time: Fri Mar 13 18:04:44 2015
+ + Completion Time: Fri Mar 13 18:15:35 2015
+ +            User: andlon
+ +        MOM Host: nid04944
+ +           Queue: debug
+ +  Req. Resources: mppnodect=1,mppnppn=24,mppwidth=24,walltime=00:20:00
+ +  Used Resources: cput=00:00:00,energy_used=0,mem=0kb,vmem=0kb,walltime=00:10:54
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/u2/a/andlon/cs267-hw2/src/bin/largescale/mpi
+ +     Submit Args: auto-hopper-mpi-On4-largescale
+ + --------------------------------------------------------------------------
+

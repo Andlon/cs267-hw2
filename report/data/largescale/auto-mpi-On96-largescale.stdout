@@ -1,0 +1,41 @@
+rm: cannot remove `mpi-On96-largescale.txt': No such file or directory
+n = 1000, n_proc = 96, simulation time = 0.342812 seconds
+Application 47609121 resources: utime ~32s, stime ~121s, Rss ~12020, inblocks ~23636, outblocks ~54798
+n = 2000, n_proc = 96, simulation time = 0.674924 seconds
+Application 47609133 resources: utime ~36s, stime ~111s, Rss ~15196, inblocks ~23644, outblocks ~54798
+n = 4000, n_proc = 96, simulation time = 0.939597 seconds
+Application 47609138 resources: utime ~54s, stime ~121s, Rss ~25264, inblocks ~23652, outblocks ~54797
+n = 8000, n_proc = 96, simulation time = 2.72077 seconds
+Application 47609143 resources: utime ~191s, stime ~168s, Rss ~41908, inblocks ~23588, outblocks ~54796
+n = 16000, n_proc = 96, simulation time = 6.75323 seconds
+Application 47609156 resources: utime ~533s, stime ~202s, Rss ~75584, inblocks ~23588, outblocks ~54796
+n = 32000, n_proc = 96, simulation time = 14.2426 seconds
+Application 47609172 resources: utime ~1240s, stime ~231s, Rss ~140684, inblocks ~24180, outblocks ~54844
+n = 64000, n_proc = 96, simulation time = 31.1562 seconds
+Application 47609185 resources: utime ~2858s, stime ~258s, Rss ~273772, inblocks ~24180, outblocks ~54844
+n = 128000, n_proc = 96, simulation time = 63.9234 seconds
+Application 47609267 resources: utime ~6012s, stime ~296s, Rss ~539752, inblocks ~24180, outblocks ~54844
+n = 256000, n_proc = 96, simulation time = 130.639 seconds
+Application 47609369 resources: utime ~12425s, stime ~363s, Rss ~1072668, inblocks ~24180, outblocks ~54844
+[NID 01112] 2015-03-13 18:17:11 Apid 47609531: initiated application termination
+[NID 01112] 2015-03-13 18:16:54 Apid 47609531: OOM killer terminated this process.
+Application 47609531 exit signals: Killed
+Application 47609531 resources: utime ~0s, stime ~4s, Rss ~4972, inblocks ~21444, outblocks ~54796
+
+ + --------------------------------------------------------------------------
+ +        Job name: auto-hopper-mpi-On96-largescale
+ +          Job Id: 8881664.hopque01
+ +          System: hopper
+ +     Queued Time: Fri Mar 13 18:03:38 2015
+ +      Start Time: Fri Mar 13 18:11:43 2015
+ + Completion Time: Fri Mar 13 18:17:19 2015
+ +            User: andlon
+ +        MOM Host: nid04133
+ +           Queue: debug
+ +  Req. Resources: mppnodect=4,mppnppn=24,mppwidth=96,walltime=00:20:00
+ +  Used Resources: cput=00:00:00,energy_used=0,mem=0kb,vmem=0kb,walltime=00:05:39
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/u2/a/andlon/cs267-hw2/src/bin/largescale/mpi
+ +     Submit Args: auto-hopper-mpi-On96-largescale
+ + --------------------------------------------------------------------------
+

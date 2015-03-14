@@ -1,0 +1,41 @@
+rm: cannot remove `mpi-On24-largescale.txt': No such file or directory
+n = 1000, n_proc = 24, simulation time = 0.167206 seconds
+Application 47608737 resources: utime ~5s, stime ~2s, Rss ~7456, inblocks ~5529, outblocks ~13699
+n = 2000, n_proc = 24, simulation time = 0.361603 seconds
+Application 47608743 resources: utime ~9s, stime ~2s, Rss ~11996, inblocks ~5529, outblocks ~13699
+n = 4000, n_proc = 24, simulation time = 0.805785 seconds
+Application 47608747 resources: utime ~20s, stime ~2s, Rss ~20972, inblocks ~5529, outblocks ~13699
+n = 8000, n_proc = 24, simulation time = 2.70346 seconds
+Application 47608761 resources: utime ~66s, stime ~3s, Rss ~36096, inblocks ~5529, outblocks ~13699
+n = 16000, n_proc = 24, simulation time = 6.6203 seconds
+Application 47608772 resources: utime ~160s, stime ~4s, Rss ~69464, inblocks ~5529, outblocks ~13699
+n = 32000, n_proc = 24, simulation time = 14.7472 seconds
+Application 47608780 resources: utime ~356s, stime ~5s, Rss ~136016, inblocks ~5529, outblocks ~13699
+n = 64000, n_proc = 24, simulation time = 31.9836 seconds
+Application 47608787 resources: utime ~770s, stime ~10s, Rss ~269280, inblocks ~5529, outblocks ~13699
+n = 128000, n_proc = 24, simulation time = 65.1614 seconds
+Application 47608825 resources: utime ~1569s, stime ~18s, Rss ~534748, inblocks ~5529, outblocks ~13699
+n = 256000, n_proc = 24, simulation time = 132.085 seconds
+Application 47608869 resources: utime ~3181s, stime ~32s, Rss ~1067796, inblocks ~5529, outblocks ~13699
+[NID 01063] 2015-03-13 18:11:10 Apid 47609027: initiated application termination
+[NID 01063] 2015-03-13 18:10:46 Apid 47609027: OOM killer terminated this process.
+Application 47609027 exit signals: Killed
+Application 47609027 resources: utime ~0s, stime ~1s, Rss ~4972, inblocks ~5361, outblocks ~13699
+
+ + --------------------------------------------------------------------------
+ +        Job name: auto-hopper-mpi-On24-largescale
+ +          Job Id: 8881663.hopque01
+ +          System: hopper
+ +     Queued Time: Fri Mar 13 18:03:35 2015
+ +      Start Time: Fri Mar 13 18:05:54 2015
+ + Completion Time: Fri Mar 13 18:11:10 2015
+ +            User: andlon
+ +        MOM Host: nid04944
+ +           Queue: debug
+ +  Req. Resources: mppnodect=1,mppnppn=24,mppwidth=24,walltime=00:20:00
+ +  Used Resources: cput=00:00:00,energy_used=0,mem=0kb,vmem=0kb,walltime=00:05:19
+ +     Acct String: mp309
+ +   PBS_O_WORKDIR: /global/u2/a/andlon/cs267-hw2/src/bin/largescale/mpi
+ +     Submit Args: auto-hopper-mpi-On24-largescale
+ + --------------------------------------------------------------------------
+

@@ -1,0 +1,22 @@
+#PBS -V
+#PBS -l mppwidth=24
+#PBS -l walltime=0:20:00
+#PBS -S /bin/bash
+#PBS -o auto-mpi-On24-largescale.stdout
+#PBS -j oe
+#PBS -A mp309
+
+cd $PBS_O_WORKDIR
+export MPI_OUTPUT=mpi-On24-largescale.txt
+rm $MPI_OUTPUT
+
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 1000 -no -s $MPI_OUTPUT
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 2000 -no -s $MPI_OUTPUT
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 4000 -no -s $MPI_OUTPUT
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 8000 -no -s $MPI_OUTPUT
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 16000 -no -s $MPI_OUTPUT
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 32000 -no -s $MPI_OUTPUT
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 64000 -no -s $MPI_OUTPUT
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 128000 -no -s $MPI_OUTPUT
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 256000 -no -s $MPI_OUTPUT
+aprun -d 1 -n 24 -N 24 ./../../mpi_naive -p 24 -n 512000 -no -s $MPI_OUTPUT
