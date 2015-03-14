@@ -81,7 +81,9 @@ Naive particle simulation has a computational complexity of $O(n^2)$ in time, wh
 
 Exploiting this property, the computational complexity may be brought down to $O(n)$. One way to accomplish this is spatial partitioning, or \emph{binning}. By partitioning the space into a set of appropriately sized bins, a particle only needs to interact with particles in the same or nearby bins.
 
-There are many ways to implement this, but most - if not all - of them belong to one of two categories: \emph{stateless} and \emph{stateful} solutions. In the stateless approach, an independent problem is solved on every time iteration. That is, the partitioning process is run completely for every time step, and each particle is assigned to a bin. In contrast, the stateful approach initially distributes particles into bins, but for every timestep, only the movement of particles are communicated between partitions. As such, each partition remembers which particles belong to that partition, which constitutes the state of the simulation.
+There are many ways to implement this, but most - if not all - of them belong to one of two categories: \emph{stateless} and \emph{stateful} solutions. In the stateless approach, an independent problem is solved on every time iteration, in the sense that the partitioning scheme merely operates on the full set of particles. That is, the partitioning process is run completely for every time step, and each particle is assigned to a bin. In contrast, the stateful approach initially distributes particles into bins, but for every timestep, only the movement of particles are communicated between partitions. As such, each partition remembers which particles belong to that partition, which constitutes the state of the simulation.
+
+As it is both conceptually simpler and easier to implement, we focus on implementing stateless solutions. Towards the end of the report, we will discuss an algorithm that employs a stateful approach to potentially improve upon our work.
 
 \section{Serial implementation}
 Pseudo-code for the naive $O(n^2)$ approach is presented in table \ref{tab:naive}. The straightforward way to improve on this by means of spatial partitioning is conceptually quite simple, and illustrated in table \ref{tab:serial}.
@@ -156,13 +158,20 @@ track the status of each bin, and assign particle address to bins using the retu
 
 \section{Experiments}
 \subsection{Complexity}
-Figure~\ref{fig:loglogOn} shows the log-log scale plot for serial and parallel codes run in O(n) time.
+Figure~\ref{fig:loglogOn} shows the log-log scale plot for serial and parallel codes run in O(n) time for a relatively small number of particles. Figure~\ref{fig:loglogOn_largescale} illustrates the same, but for larger scale problems.
 
 \begin{figure}[htb]
   \centering
   \includegraphics[width=0.9\textwidth]{graphics/loglogOn.png}
   \caption{Log-log scale plot for serial and parallel codes}
   \label{fig:loglogOn}
+\end{figure}
+
+\begin{figure}[htb]
+  \centering
+  \includegraphics[width=0.9\textwidth]{graphics/loglogOn_largescale.png}
+  \caption{Log-log scale plot for serial and parallel codes for larger scale simulations. Supplied exponents in the $O(n^x)$ estimate are based on simple linear regression.}
+  \label{fig:loglogOn_largescale}
 \end{figure}
 
 \subsection{Speedup}
@@ -196,19 +205,14 @@ Figure~\ref{fig:gpu} shows the performance of our code versus the naive GPU code
 
 \section{Discussions}
 \subsection{Pthreads v.s. openMP v.s. CUDA}
-OpenMP is easier to implement and the overhead is well-managed. However, Pthreads is more flexible -- one could call
-different routines together. In general, these two methods are similar to each other in that they are similar memory
-sharing strategy. CUDA is more powerful for massive parallelization. However, it requires memory management for devices,
-and it is a bit difficult to scale up.
+OpenMP is easier to implement and the overhead is well-managed. However, Pthreads is more flexible -- one could call different routines together. In general, these two methods are similar to each other in that they are similar memory
+sharing strategy. CUDA is more powerful for massive parallelization. However, it requires memory management for devices, and it is a bit difficult to scale up.
 
 \subsection{Shared memory model v.s. distributed memory model}
-Shared memory models are easier to implement, and they tend to give better speedup performance. However, distributed memory 
-models can scale up massively.
+Shared memory models are easier to implement, and they tend to give better speedup performance. However, distributed memory models can scale up massively.
 
 \section{Conclusion}
-Different parallelization models are shown to be effective in parallelizing particle simulations. Of the four parallelization models,
-CUDA is shown to be most effective in the simulation. Pthreads and openMP may achieve an average of 40\% scaling factor, while
-MPI is 
+Different parallelization models are shown to be effective in parallelizing particle simulations. Looking at our implementations of the four parallelization models, CUDA is shown to be most effective in the simulation. Pthreads and OpenMP may achieve an average of 40\% scaling factor for a problem of size $n = 500$, while MPI 
 
 % include your own bib file like this:
 \bibliographystyle{acl}

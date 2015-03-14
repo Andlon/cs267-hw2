@@ -8,10 +8,10 @@ set xlabel "Number of particles"
 set ylabel "Simulation time (s)"
 set style function linespoints
 
-plot "../data/largescale/mpi-On4-largescale.txt" using 1:3 title 'MPI - 4 tasks O(n^x)' pt 7 ps 2 with linespoints, \
-     "../data/largescale/mpi-On24-largescale.txt" using 1:3 title 'MPI - 24 tasks O(n^x)' pt 7 ps 2 with linespoints, \
-     "../data/largescale/mpi-On96-largescale.txt" using 1:3 title 'MPI - 96 tasks O(n^x)' pt 7 ps 2 with linespoints, \
-     "../data/largescale/serial-alternative-largescale.txt" using 1:2 title 'Serial - O(n^1.07)' pt 7 ps 2 with linespoints, \
+plot "../data/largescale/mpi-On4-largescale.txt" using 1:3 title 'MPI - 4 tasks O(n^1.24)' pt 7 ps 2 with linespoints, \
+     "../data/largescale/mpi-On24-largescale.txt" using 1:3 title 'MPI - 24 tasks O(n^1.23)' pt 7 ps 2 with linespoints, \
+     "../data/largescale/mpi-On96-largescale.txt" using 1:3 title 'MPI - 96 tasks O(n^1.11)' pt 7 ps 2 with linespoints, \
+     "../data/largescale/serial-alternative-largescale.txt" using 1:2 title 'Serial - O(n^1.07)' pt 7 ps 2 lw 3 with linespoints, \
      "../data/largescale/openmp-On3-largescale.txt" using 1:3 title 'OpenMP - 3 threads - O(n^1.07)' pt 7 ps 2 with linespoints, \
      "../data/largescale/openmp-On6-largescale.txt" using 1:3 title 'OpenMP - 6 threads - O(n^1.04)' pt 7 ps 2 with linespoints, \
      "../data/largescale/openmp-On12-largescale.txt" using 1:3 title 'OpenMP - 12 threads - O(n^1.02)' pt 7 ps 2 with linespoints, \
